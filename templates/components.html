@@ -1,0 +1,69 @@
+{#- Components for content files and templates. Their output starts at column 0 and carries no
+    blank lines, so Markdown passes it through as one HTML block. -#}
+
+{% component shot(src: string, alt: string, caption: string = "", title: string = "") %}
+{%- set small = resize_image(path="img/shots/" ~ src, width=1120, op="fit_width", format="webp", quality=88) -%}
+<figure><a href="/img/shots/{{ src }}"><span class="shot"><img src="{{ small.url }}" alt="{{ alt }}" width="{{ small.width }}" height="{{ small.height }}" loading="lazy" decoding="async"></span></a>{% if caption %}<figcaption>{% if title %}<b>{{ title }}</b> · {% endif %}{{ caption }}</figcaption>{% endif %}</figure>
+{% endcomponent shot %}
+
+{% component gallery() %}
+<div class="gallery">
+{{ body }}
+</div>
+{% endcomponent gallery %}
+
+{% component status(label: string, kind: string = "amber") %}
+<span class="pill {{ kind }}">{{ label }}</span>
+{% endcomponent status %}
+
+{#- How a request travels: clients, the gateway, the backends. -#}
+{% component flow() %}
+<div class="flow" role="img" aria-label="Clients talk to lmgw over /v1, /v1/messages and /mcp; lmgw sends each request to a local container, a cloud provider or an MCP server.">
+<div class="col"><div class="node">OpenAI SDKs and tools<small>/v1</small></div><div class="node">Anthropic SDKs, Claude Code<small>/v1/messages</small></div><div class="node">Voice clients<small>/v1/realtime</small></div><div class="node">MCP clients<small>/mcp</small></div></div>
+<div class="arrow" aria-hidden="true">→</div>
+<div class="node gw"><strong>lmgw</strong><span>aliases · keys · usage · VRAM scheduling</span></div>
+<div class="arrow" aria-hidden="true">→</div>
+<div class="col"><div class="node local">llama.cpp<small>chat · embed · rerank</small></div><div class="node local">audio.cpp<small>speech in and out</small></div><div class="node local">stable-diffusion.cpp<small>images</small></div><div class="node cloud">Cloud providers<small>OpenAI-compatible · Anthropic · Gemini</small></div><div class="node tools">MCP servers<small>stdio in Podman · HTTP</small></div></div>
+</div>
+{% endcomponent flow %}
+
+{#- ---- API reference: an OpenAPI 3.1 schema rendered as nested property rows ---- -#}
+
+{#- A description from the OpenAPI document: plain text with `code` spans. It is escaped first, since
+    it names placeholders such as <host> that Markdown would take for HTML. -#}
+{% component api.text(t: string) %}
+{{- t | escape_html | regex_replace(pattern="`([^`]+)`", rep="<code>$1</code>") | newlines_to_br | safe -}}
+{% endcomponent api.text %}
+
+{#- The type of a schema as one short HTML string: a $ref links to its schema below. -#}
+{% component api.type(s: map) %}
+{%- if s["$ref"] -%}
+{%- set name = s["$ref"] | split(pat="/") | last -%}
+<a href="#schema-{{ name }}">{{ name }}</a>
+{%- elif s.oneOf or s.anyOf -%}
+{%- for v in (s.oneOf or s.anyOf) -%}{{ <api.type s={v} /> }}{% if not loop.last %} | {% endif %}{%- endfor -%}
+{%- elif s.type == "array" -%}
+array{% if s.items %} of {{ <api.type s={s.items} /> }}{% endif %}
+{%- elif s.type is array -%}
+{{ s.type | join(sep=" | ") }}
+{%- elif s.type -%}
+{{ s.type }}{% if s.format %} ({{ s.format }}){% endif %}
+{%- elif s.const is defined -%}
+{{ s.const | json_encode }}
+{%- else -%}
+any
+{%- endif -%}
+{% endcomponent api.type %}
+
+{#- One table row per property, children indented below their parent. -#}
+{% component api.props(props: map, required: array = [], depth: integer = 0) %}
+{%- for name, p in props -%}
+<tr><td class="name" style="padding-left: {{ 10 + depth * 18 }}px"><code>{{ name }}</code>{% if name in required %}<span class="req" title="required">required</span>{% endif %}</td>
+<td><span class="type">{{ <api.type s={p} /> }}</span>{% if p.description %} {{ <api.text t={p.description} /> }}{% endif %}{% if p.enum %} <span class="enum">One of {% for e in p.enum %}<code>{{ e }}</code>{% if not loop.last %}, {% endif %}{% endfor %}.</span>{% endif %}{% if p.default is defined %} <span class="enum">Default <code>{{ p.default | json_encode }}</code>.</span>{% endif %}</td></tr>
+{%- if p.properties -%}
+{{ <api.props props={p.properties} required={p.required or []} depth={depth + 1} /> }}
+{%- elif p.items and p.items.properties -%}
+{{ <api.props props={p.items.properties} required={p.items.required or []} depth={depth + 1} /> }}
+{%- endif -%}
+{%- endfor -%}
+{% endcomponent api.props %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="wrap">
+  <header class="page-head">
+    <h1>{{ section.title }}</h1>
+    {% if section.description %}<p class="lead">{{ section.description }}</p>{% endif %}
+  </header>
+  <div class="cards" style="padding-bottom: 64px">
+  {% for p in section.pages %}
+    <a class="card" href="{{ p.permalink }}"><h3>{{ p.title }}</h3><p>{{ p.description }}</p><span class="more">Read →</span></a>
+  {% endfor %}
+  </div>
+</div>
+{% endblock content %}

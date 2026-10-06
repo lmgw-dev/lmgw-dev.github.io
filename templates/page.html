@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="wrap narrow">
+  <header class="page-head">
+    {% if page.extra.kicker %}<div class="kicker">{{ page.extra.kicker }}</div>{% endif %}
+    <h1>{{ page.title }}{% if page.extra.status %} {{ <status label={page.extra.status} kind={page.extra.status_kind or "amber"} /> }}{% endif %}</h1>
+    {% if page.description %}<p class="lead">{{ page.description }}</p>{% endif %}
+  </header>
+  <article class="prose{% if page.extra.wide %} wide{% endif %}">
+    {{ page.content | safe }}
+  </article>
+</div>
+{% endblock content %}

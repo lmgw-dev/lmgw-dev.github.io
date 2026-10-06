@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Not found · lmgw{% endblock title %}
+{% block content %}
+<div class="wrap narrow">
+  <header class="page-head">
+    <div class="kicker">404</div>
+    <h1>This page doesn't exist</h1>
+    <p class="lead">It may have moved. The <a href="{{ get_url(path='@/_index.md') }}">front page</a> links to
+      everything on this site, and the code lives at <a href="{{ config.extra.github_org }}">github.com/lmgw-dev</a>.</p>
+  </header>
+</div>
+{% endblock content %}

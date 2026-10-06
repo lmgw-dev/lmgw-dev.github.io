@@ -1,0 +1,27 @@
+# The lmgw-dev project site, https://lmgw-dev.github.io/ (README.md says how to build it).
+base_url = "https://lmgw-dev.github.io"
+title = "lmgw"
+description = "lmgw, the local model gateway: your own GPU behind OpenAI- and Anthropic-compatible APIs, with the cloud one alias away. A Linux desktop app, and the clients built on it."
+default_language = "en"
+compile_sass = false
+build_search_index = false
+generate_feeds = false
+
+[markdown]
+smart_punctuation = false
+
+[markdown.highlighting]
+light_theme = "github-light"
+dark_theme = "github-dark"
+error_on_missing_language = true
+
+[extra]
+github_org = "https://github.com/lmgw-dev"
+github_repo = "https://github.com/lmgw-dev/lmgw"
+latest_release = "https://github.com/lmgw-dev/lmgw/releases/latest"
+# The gateway's default address (lmgw README, "Network and access defaults").
+gateway = "127.0.0.1:8787"
+
+[link_checker]
+# GitHub draws README heading anchors with JavaScript, so a fetch never finds them.
+skip_anchor_prefixes = ["https://github.com/"]

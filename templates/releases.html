@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{#- data/releases.json is the GitHub releases list, trimmed (`just releases` refreshes it; CI does on
+    every build). -#}
+{% block content %}
+{% set releases = load_data(path="data/releases.json") %}
+<div class="wrap narrow">
+  <header class="page-head">
+    <div class="kicker">lmgw</div>
+    <h1>{{ page.title }}</h1>
+    <p class="lead">{{ page.description }}</p>
+  </header>
+  <div class="prose">
+  {% for r in releases %}
+    <section class="release" id="{{ r.tag }}">
+      <div class="release-head">
+        <h2><a href="{{ r.url }}">{{ r.name or r.tag }}</a></h2>
+        <time datetime="{{ r.published }}">{{ r.published | date(format="%Y-%m-%d") }}</time>
+        {% if loop.first %}<span class="pill ok">Latest</span>{% endif %}
+        {% if r.prerelease %}<span class="pill amber">Pre-release</span>{% endif %}
+      </div>
+      {{ r.body | markdown | safe }}
+      {% set files = [a for a in r.assets if a.name is ending_with(pat=".rpm") or a.name is ending_with(pat=".AppImage")] %}
+      {% if files %}<div class="assets">{% for a in files %}<a href="{{ a.url }}">{{ a.name }} · {{ a.size | filesizeformat }}</a>{% endfor %}</div>{% endif %}
+    </section>
+  {% endfor %}
+  </div>
+</div>
+{% endblock content %}

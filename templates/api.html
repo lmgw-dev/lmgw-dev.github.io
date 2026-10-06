@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{#- The API reference, rendered from the OpenAPI document a running lmgw serves at /v1/openapi.json
+    (static/openapi-v1.json; `just openapi` refreshes it from the lmgw sources). -#}
+{% block content %}
+{% set doc = load_data(path="static/openapi-v1.json") %}
+{% set methods = ["get", "post", "put", "patch", "delete"] %}
+<div class="wrap">
+  <header class="page-head">
+    <div class="kicker">Reference</div>
+    <h1>{{ page.title }}</h1>
+    <p class="lead">{{ <api.text t={doc.info.description} /> }}</p>
+    <p class="tagline-small">Generated from the OpenAPI document of lmgw {{ doc.info.version }}.
+      <a href="{{ get_url(path='openapi-v1.json') }}" download>Download openapi-v1.json</a></p>
+  </header>
+
+  <div class="api">
+    <nav class="api-nav" aria-label="Endpoints">
+      <h4>Overview</h4>
+      <a href="#using">Base URLs and keys</a>
+      <a href="#headers">lmgw headers</a>
+      {% for tag in doc.tags %}
+      <h4>{{ tag["x-displayName"] or tag.name }}</h4>
+      {% for path, ops in doc.paths %}{% for method, op in ops %}{% if method in methods and tag.name in op.tags %}
+      <a href="#op-{{ op.operationId }}"><span class="verb {{ method }}">{{ method }}</span><code>{{ path | replace(from="/", to="/<wbr>") | safe }}</code></a>
+      {% endif %}{% endfor %}{% endfor %}
+      {% endfor %}
+      <h4>Schemas</h4>
+      <a href="#schemas">All {{ doc.components.schemas | length }} schemas</a>
+    </nav>
+
+    <div class="api-main">
+      <section id="using" class="prose wide">
+        {{ page.content | safe }}
+      </section>
+
+      {#- Every x-lmgw header the document names, once: request headers from the parameters,
+          response headers from the responses. -#}
+      {% set_global seen = [] %}
+      {% set_global hdrs = [] %}
+      {% for path, ops in doc.paths %}{% for method, op in ops %}{% if method in methods %}
+        {% for prm in op.parameters or [] %}{% if prm.in == "header" and prm.name is starting_with(pat="x-lmgw-") and not (prm.name in seen) %}
+          {% set_global seen = [...seen, prm.name] %}
+          {% set_global hdrs = [...hdrs, {"name": prm.name, "dir": "request", "description": prm.description or ""}] %}
+        {% endif %}{% endfor %}
+        {% for code, r in op.responses %}{% if r.headers %}{% for name, h in r.headers %}{% if name is starting_with(pat="x-lmgw-") and not (name in seen) %}
+          {% set_global seen = [...seen, name] %}
+          {% set_global hdrs = [...hdrs, {"name": name, "dir": "response", "description": (h.description or "") | trim_start(pat="RESPONSE: ")}] %}
+        {% endif %}{% endfor %}{% endif %}{% endfor %}
+      {% endif %}{% endfor %}{% endfor %}
+      <h2 id="headers">lmgw headers</h2>
+      <p class="muted">lmgw adds these to the protocols it speaks. A client that ignores them works unchanged.</p>
+      <table class="stack">
+        <thead><tr><th>Header</th><th>Sent in</th><th>Meaning</th></tr></thead>
+        <tbody>
+        {% for h in hdrs | sort(attribute="name") %}
+          <tr><td class="name"><code>{{ h.name }}</code></td><td>{{ h.dir }}</td><td>{{ <api.text t={h.description} /> }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+
+      {% for tag in doc.tags %}
+      <h2 id="tag-{{ tag.name }}">{{ tag["x-displayName"] or tag.name }}</h2>
+      {% for path, ops in doc.paths %}{% for method, op in ops %}{% if method in methods and tag.name in op.tags %}
+      <section class="op" id="op-{{ op.operationId }}">
+        <div class="op-head"><span class="verb {{ method }}">{{ method }}</span><code class="path">{{ path }}</code></div>
+        <h3>{{ op.summary }}</h3>
+        {% if op.description %}<div class="desc"><p>{{ <api.text t={op.description} /> }}</p></div>{% endif %}
+
+        {% set params = [p for p in op.parameters or [] if not (p.in == "header" and p.name is starting_with(pat="x-lmgw-"))] %}
+        {% set lmgw_params = [p for p in op.parameters or [] if p.in == "header" and p.name is starting_with(pat="x-lmgw-")] %}
+        {% if params %}
+        <h4>Parameters</h4>
+        <table class="stack">
+          <thead><tr><th>Name</th><th>In</th><th>Description</th></tr></thead>
+          <tbody>
+          {% for p in params %}
+            <tr><td class="name"><code>{{ p.name }}</code>{% if p.required %}<span class="req">required</span>{% endif %}</td><td>{{ p.in }}</td>
+              <td>{% if p.schema %}<span class="type">{{ <api.type s={p.schema} /> }}</span> {% endif %}{% if p.description %}{{ <api.text t={p.description} /> }}{% endif %}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+        {% if lmgw_params %}<p class="tagline-small">Also takes {% for p in lmgw_params %}<a href="#headers"><code>{{ p.name }}</code></a>{% if not loop.last %}, {% endif %}{% endfor %} (see lmgw headers).</p>{% endif %}
+
+        {% if op.requestBody %}
+        <h4>Request body{% if op.requestBody.required %} <span class="req">required</span>{% endif %}</h4>
+        {% for ctype, media in op.requestBody.content %}
+          <p><code>{{ ctype }}</code>{% if media.schema %}: <span class="type">{{ <api.type s={media.schema} /> }}</span>{% endif %}</p>
+          {% if media.schema and media.schema.properties %}
+          <table><tbody>{{ <api.props props={media.schema.properties} required={media.schema.required or []} /> }}</tbody></table>
+          {% elif media.schema and media.schema["$ref"] %}
+          {% set ref_name = media.schema["$ref"] | split(pat="/") | last %}
+          {% set ref = doc.components.schemas[ref_name] %}
+          {% if ref.properties %}<details class="example"><summary>Fields of {{ ref_name }}</summary>
+          <table><tbody>{{ <api.props props={ref.properties} required={ref.required or []} /> }}</tbody></table></details>{% endif %}
+          {% endif %}
+          {% set ex = media.example or media.schema?.example %}
+          {% if ex %}<details class="example"><summary>Example</summary><pre><code>{{ ex | json_encode(pretty=true) }}</code></pre></details>{% endif %}
+        {% endfor %}
+        {% endif %}
+
+        <h4>Responses</h4>
+        <table>
+          <thead><tr><th>Status</th><th>Description</th></tr></thead>
+          <tbody>
+          {% for code, r in op.responses %}
+            <tr><td class="name"><code>{{ code }}</code></td>
+              <td>{{ <api.text t={r.description or ""} /> }}
+                {% if r.content %}<br>{% for ctype, media in r.content %}<code>{{ ctype }}</code>{% if media.schema %}: <span class="type">{{ <api.type s={media.schema} /> }}</span>{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}{% endif %}
+                {% if r.headers %}<br><span class="muted">Headers:</span> {% for name, h in r.headers %}{% if name is starting_with(pat="x-lmgw-") %}<a href="#headers"><code>{{ name }}</code></a>{% else %}<code>{{ name }}</code>{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}
+              </td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </section>
+      {% endif %}{% endfor %}{% endfor %}
+      {% endfor %}
+
+      <h2 id="schemas">Schemas</h2>
+      {% for name, s in doc.components.schemas %}
+      <section class="schema" id="schema-{{ name }}">
+        <h3>{{ name }}</h3>
+        {% if s.description %}<p class="muted">{{ <api.text t={s.description} /> }}</p>{% endif %}
+        {% if s.properties %}
+        <table><tbody>{{ <api.props props={s.properties} required={s.required or []} /> }}</tbody></table>
+        {% elif s.oneOf or s.anyOf %}
+        <p>One of: {% for v in (s.oneOf or s.anyOf) %}<span class="type">{{ <api.type s={v} /> }}</span>{% if v.description %} ({{ <api.text t={v.description} /> }}){% endif %}{% if not loop.last %}; {% endif %}{% endfor %}</p>
+        {% else %}
+        <p><span class="type">{{ <api.type s={s} /> }}</span></p>
+        {% endif %}
+      </section>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock content %}

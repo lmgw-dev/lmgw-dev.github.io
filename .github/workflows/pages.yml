@@ -1,0 +1,63 @@
+# Build the site with the pinned Zola (tools.env) and deploy it to GitHub Pages.
+# The repository's Pages source must be "GitHub Actions" (Settings → Pages).
+#
+# The release list is fetched fresh on every build, so a daily run picks up a new lmgw release
+# without a commit here. If the fetch fails, the committed data/releases.json is used.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; a newer push replaces a queued one, never a running one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Zola
+        run: scripts/install-zola.sh
+
+      - name: Refresh the release list
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api repos/lmgw-dev/lmgw/releases --jq "$(cat scripts/releases.jq)" > data/releases.json.new \
+              && [ "$(jq length data/releases.json.new)" -gt 0 ]; then
+            mv data/releases.json.new data/releases.json
+          else
+            echo "::warning::could not fetch the lmgw releases; building with the committed list"
+          fi
+          jq -r '.[] | .tag + "  " + .published' data/releases.json
+
+      - name: Build
+        run: .tools/zola build
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
