@@ -43,6 +43,9 @@ just shots      # screenshots of every page, light, dark and phone width, into t
 `.github/workflows/pages.yml` builds and deploys on every push to `main`, daily, and by hand. The
 repository's Pages source must be set to **GitHub Actions** (Settings → Pages).
 
-## Fonts
+## License
 
-IBM Plex, served from `static/fonts/`, is under the SIL Open Font License 1.1 (`static/fonts/OFL.txt`).
+The site (text, templates, styles and scripts) is under the MIT License ([LICENSE](LICENSE)). Two
+parts keep their own terms: IBM Plex in `static/fonts/` is under the SIL Open Font License 1.1
+(`static/fonts/OFL.txt`), and the logo and screenshots are lmgw's, from its repository
+([FSL-1.1-MIT](https://github.com/lmgw-dev/lmgw/blob/main/LICENSE.md)).
