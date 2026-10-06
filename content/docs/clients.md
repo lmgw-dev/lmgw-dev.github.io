@@ -28,7 +28,8 @@ stream = client.chat.completions.create(
     stream=True,
 )
 for chunk in stream:
-    print(chunk.choices[0].delta.content or "", end="", flush=True)
+    if chunk.choices:  # the last chunk carries only the token usage
+        print(chunk.choices[0].delta.content or "", end="", flush=True)
 ```
 
 The Anthropic SDKs take the bare address, because they add `/v1/messages` themselves:
@@ -43,12 +44,13 @@ message = client.messages.create(
     max_tokens=512,
     messages=[{"role": "user", "content": "Hello!"}],
 )
-print(message.content[0].text)
+print("".join(block.text for block in message.content if block.type == "text"))
 ```
 
 Both reach the same alias. A model served by llama.cpp answers an Anthropic client, and a Claude
 model answers an OpenAI client: lmgw translates streaming, tool calls, images and reasoning in
-both directions.
+both directions. A model that reasons puts a `thinking` block before its text, which is why the
+sample joins only the text blocks.
 
 ## Find out what a model can do
 
@@ -60,10 +62,11 @@ whether to send images, offer tools or show a thinking toggle, instead of guessi
 {
   "id": "my-model",
   "object": "model",
+  "owned_by": "llama-server",
   "context_length": 131072,
   "capabilities": {
     "task": "chat",
-    "endpoints": ["/v1/chat/completions", "/v1/messages", "/v1/responses", "/v1/realtime"],
+    "endpoints": ["/v1/chat/completions", "/v1/messages", "/v1/responses", "/v1/completions"],
     "input_modalities": ["text", "image"],
     "vision": true,
     "reasoning": { "kind": "toggle", "can_disable": true, "enabled": false },
@@ -74,7 +77,7 @@ whether to send images, offer tools or show a thinking toggle, instead of guessi
 }
 ```
 
-`endpoints` names the routes that accept the model, `notes` explains its quirks in plain
+That is an excerpt of one entry. `endpoints` names the routes that accept the model, `notes` explains its quirks in plain
 sentences, and an unknown capability is left out rather than reported as missing.
 [ModelCapabilities](/docs/api/#schema-ModelCapabilities) in the API reference has every field.
 
@@ -92,30 +95,33 @@ When a route cannot express a control, the response says so in `x-lmgw-reasoning
 
 ## Which model answered
 
-An alias can have a fallback, usually a cloud model that takes over while the local one is paused
-or the card is full. The response body keeps the alias you asked for in its `model` field, so
+A local model can have a fallback, usually a cloud alias that takes over while the GPU hold pauses
+local models, or while another program holds the memory the model needs. The response body keeps the alias you asked for in its `model` field, so
 clients that check it keep working. The headers say what really happened:
 
 - `x-lmgw-fallback` names the alias that answered instead, and `x-lmgw-fallback-reason` says why.
 - `x-lmgw-images-omitted` counts images that went to a fallback without vision as text
   placeholders.
-- `x-lmgw-candidate` names the local model that answered a candidate alias, one name for several
-  local models of which lmgw picks the one that fits.
+- `x-lmgw-candidate` names the local model that answered a candidate alias: one name for a primary
+  model and alternates, answered by whichever of them is already loaded.
 
-With no fallback, a request to a paused model fails with `503` and the code `gpu_hold`, so you
-choose, per alias, whether a request may leave the machine. The
+With no fallback, a request to a paused model fails with `503` and the code `gpu_hold`, so the
+fallback settings decide whether a request may leave the machine. Chat models take the
+gateway-wide hold fallback unless their own row says otherwise. The
 [headers table](/docs/api/#headers) lists all of them.
 
 ## Voice
 
-`ws://127.0.0.1:8787/v1/realtime` speaks OpenAI's Realtime protocol, so the realtime clients of the
-OpenAI SDKs connect with the same base URL. Behind it is a cascade of your own models: lmgw
+`ws://127.0.0.1:8787/v1/realtime` speaks OpenAI's Realtime protocol. The OpenAI Python SDK's
+realtime client connects with the same base URL as above, since it turns `http` into `ws`. The
+JavaScript SDK insists on `wss:`, so there, pass the URL to a client that takes one, such as the
+Agents SDK's `OpenAIRealtimeWebSocket({ url })`. Behind it is a cascade of your own models: lmgw
 detects the turns, transcribes them with a speech-to-text model, answers with a chat model and
 speaks with a text-to-speech model. Pick the three under **Settings → Realtime**.
 
 Sessions take audio or text output, PCM16 at 24 kHz, `server_vad`, `semantic_vad` and manual
-turns, and barge-in. Function tools work as with OpenAI. WebRTC, SIP, ephemeral keys and
-transcription-only sessions are not implemented yet.
+turns, and barge-in. Function tools work as with OpenAI. WebRTC, SIP, ephemeral keys,
+transcription-only sessions and G.711 are not implemented yet.
 
 A session can also use the MCP servers lmgw serves, by label:
 
@@ -126,8 +132,8 @@ A session can also use the MCP servers lmgw serves, by label:
 ```
 
 lmgw runs the call before the response ends and reports it as an `mcp_call` item, and as in
-OpenAI's API, the client sends `response.create` for the answer. The OpenAI Agents SDK does that by
-itself. To offer a picker, `GET /v1/mcp/servers` lists the labels a key may use and
+OpenAI's API, the client sends `response.create` for the answer. The OpenAI Agents SDK for
+JavaScript (`hostedMcpTool`) does that by itself. To offer a picker, `GET /v1/mcp/servers` lists the labels a key may use and
 `GET /v1/mcp/servers/{label}` the tools behind one.
 
 ## Tools over MCP
@@ -141,22 +147,23 @@ claude mcp add --transport http lmgw http://127.0.0.1:8787/mcp
 ```
 
 A key's tool scope decides which of them a client sees. The same tools can be named in a
-`/v1/responses` request with `{"type": "mcp", "server_label": ...}`; lmgw resolves the label
-against its own servers and never connects to a URL a client sends.
+`/v1/responses` request with `{"type": "mcp", "server_label": ...}` on any alias lmgw answers
+itself, which is every local model and every upstream not set to take `/v1/responses` directly.
+lmgw resolves the label against its own servers and never connects to a URL a client sends.
 
 ## Embeddings, rerank and tokens
 
 - `POST /v1/embeddings` takes OpenAI's request shape. Local embedding models appear with the
   `embed/` prefix by default.
 - `POST /v1/rerank` takes a `query` and `documents` (Jina's spelling) or `texts` (TEI's).
-- `POST /v1/count_tokens` counts a request for any model, in either dialect, and
-  `POST /v1/messages/count_tokens` and `POST /tokenize` are there for clients that expect
-  Anthropic's or llama.cpp's routes.
+- `POST /v1/count_tokens` takes `{model, input}` and counts a text for any model, with the
+  backend's own tokenizer where it has one. `POST /v1/messages/count_tokens` and `POST /tokenize`
+  are there for clients that expect Anthropic's or llama.cpp's routes.
 
 ## Apps that need more than inference
 
 A desktop or phone client like [Kai](@/kai.md) needs more than model calls: Chat threads it shares
-with the dashboard, a feed of changes, a key per device and a way to offer its own tools. lmgw is
-adding these as general features of its API, described in its
+with the dashboard, a feed of changes, a key per device and a way to offer its own tools. lmgw
+plans these as general features of its API, described in its
 [client apps design record](https://github.com/lmgw-dev/lmgw/blob/main/docs/design/2026-10-06-client-apps-design.md).
 Until they land, the routes in the [API reference](@/docs/api.md) are the stable surface.

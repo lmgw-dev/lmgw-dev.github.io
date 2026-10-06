@@ -24,7 +24,7 @@ and carry a budget and rate limits.
 
 Errors come in the shape of the protocol you called: OpenAI's on the OpenAI routes, Anthropic's on
 `/v1/messages`. A local model paused by the GPU hold answers `503` with the code `gpu_hold`, unless
-its alias has a fallback, which then answers instead and is named in `x-lmgw-fallback`.
+it has a fallback, which then answers instead and is named in `x-lmgw-fallback`.
 
 This page covers what a client can reach with an inference key. The dashboard's own API (`/api`)
 is documented in the app, on its **API reference** page.

@@ -1,6 +1,6 @@
 +++
 title = "Kai"
-description = "A voice client for the KDE Plasma desktop. Talk to your models at any time, see what Kai is doing in the tray and over the desktop, and keep one ongoing conversation. Every model call goes through lmgw."
+description = "A planned voice client for the KDE Plasma desktop: talk to your models at any time, see what Kai is doing in the tray and over the desktop, and keep one ongoing conversation. Every model call will go through lmgw."
 [extra]
 kicker = "A Plasma client of lmgw"
 status = "In development"
@@ -9,14 +9,14 @@ status = "In development"
 <div class="status-box">
 
 Kai is being built and has no release yet. It will be published in the
-[lmgw-dev organization](https://github.com/lmgw-dev) once its first version works. Until then this
-page describes the plan, which can still change.
+[lmgw-dev organization](https://github.com/lmgw-dev). Until then this page describes the plan,
+which can still change.
 
 </div>
 
-Kai is a separate program that lives in the Plasma tray. It holds no models of its own: speech
-recognition, the chat model and the voice all run in lmgw, and Kai reaches them through the same
-public API any other client uses. If lmgw is set up to talk, Kai can talk.
+Kai will be a separate program that lives in the Plasma tray. It holds no models of its own:
+speech recognition, the chat model and the voice all run in lmgw, and Kai reaches them through
+lmgw's documented API. If lmgw is set up to talk, Kai can talk.
 
 ## The first version
 
@@ -26,10 +26,10 @@ public API any other client uses. If lmgw is set up to talk, Kai can talk.
 - **One ongoing conversation.** Everything you say goes into one conversation called "Kai", stored
   in lmgw's Chat, so you can read it or carry on typing in the dashboard. A new conversation starts
   after an idle time you choose, or when you ask for one.
-- **State you can see.** The tray icon shows whether Kai is idle, listening, thinking, speaking,
-  muted, or waiting because the GPU is on hold. While voice is active, a ring drawn over the
-  desktop follows the voice, the same ring as in lmgw's Chat.
-- **Desktop audio done properly.** Capture and playback go through PipeWire, with the echo modes of
+- **State you can see.** The tray icon shows whether Kai is idle, listening, thinking, speaking or
+  muted, with an amber badge while the GPU hold is on. During a turn, a ring drawn over the desktop
+  follows the voice, the same ring as in lmgw's Chat.
+- **Audio through PipeWire.** Capture and playback go through PipeWire, with the echo modes of
   lmgw's Chat: a microphone that cancels echo itself, echo cancellation in Kai, headphones, or half
   duplex. You can talk over Kai to interrupt it.
 - **Starts with the session.** An XDG autostart entry, no system service. Shortcuts are set in
@@ -57,5 +57,4 @@ can use them:
   chat, agents and other clients can use them.
 
 lmgw's [client apps design record](https://github.com/lmgw-dev/lmgw/blob/main/docs/design/2026-10-06-client-apps-design.md)
-has the details, and the first of these is being built now. [Build on lmgw](@/docs/clients.md)
-shows what clients can use today.
+has the details. [Build on lmgw](@/docs/clients.md) shows what clients can use today.

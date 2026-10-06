@@ -58,8 +58,8 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
   chat model.
 - **Local or cloud behind one alias.** Streaming, tool calls and reasoning are translated in both
   directions, so switching an alias changes nothing for the client.
-- **Fallbacks.** A local model can name a cloud alias to take over while the GPU is on hold or the
-  card is full. The `x-lmgw-fallback` response header names the alias that answered.
+- **Fallbacks.** A local model can name a cloud alias to take over while the GPU is on hold or
+  another program holds the memory it needs. The `x-lmgw-fallback` response header names the alias that answered.
 - **Model capabilities in `/v1/models`.** Context length, output limit, modalities and reasoning
   controls, per model.
 - **Voice conversations.** `/v1/realtime` speaks OpenAI's Realtime protocol over a WebSocket and
@@ -86,9 +86,9 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
   Speech models switched to the CPU keep serving.
 - **Chat, with voice.** Chat with any alias, with attachments, knowledge bases and MCP tools.
   Dictate, have replies read aloud, or talk in voice mode, all on your own speech models.
-- **A native window, a browser too.** The dashboard is Rust from end to end (Leptos, compiled to
+- **A native window, a browser too.** The dashboard is written in Rust (Leptos, compiled to
   WebAssembly). On KDE Plasma the window takes the desktop's frame, fonts and colours. Bind lmgw to
-  your network and the same dashboard works in any browser.
+  your network and the same dashboard works in a browser.
 
 ## Requirements
 
@@ -108,8 +108,8 @@ install it:
 sudo dnf install ./lmgw-*.x86_64.rpm
 ```
 
-From then on the app checks for new releases and offers to install them. Releases also carry an
-AppImage, built on current Fedora. The
+From then on the app checks for new releases and offers to install them. Most releases also carry
+an AppImage, built on current Fedora, so it needs a glibc at least that recent. The
 [README](https://github.com/lmgw-dev/lmgw#building-from-source) explains how to build from source.
 
 ## Quick start

@@ -17,7 +17,7 @@
       <a class="btn primary" href="{{ config.extra.latest_release }}">Download lmgw {{ latest.tag | trim_start(pat="v") }}</a>
       <a class="btn" href="{{ get_url(path='@/lmgw.md') }}">What it does</a>
     </div>
-    <p class="meta">RPM for Fedora, AppImage for other distributions · source on <a href="{{ config.extra.github_repo }}">GitHub</a> · FSL-1.1-MIT</p>
+    <p class="meta">RPM for Fedora, usually an AppImage too · source on <a href="{{ config.extra.github_repo }}">GitHub</a> · FSL-1.1-MIT</p>
     {% set hero = resize_image(path="img/shots/overview.png", width=1920, op="fit_width", format="webp", quality=90) %}
     <div class="shot hero-shot"><img src="{{ hero.url }}" width="{{ hero.width }}" height="{{ hero.height }}" alt="The lmgw dashboard: running models, GPU memory and live requests"></div>
   </div>
@@ -33,7 +33,7 @@
         own container on llama.cpp, audio.cpp or stable-diffusion.cpp. They start when a request needs them and share
         the card by measured VRAM.</p></div>
       <div class="point"><h3>Two API dialects, one port</h3><p>OpenAI's chat completions, responses and embeddings next to
-        Anthropic's messages. Any client reaches any model, with streaming, tool calls and reasoning translated both
+        Anthropic's messages. Any client reaches any chat model, with streaming, tool calls and reasoning translated both
         ways.</p></div>
       <div class="point"><h3>Cloud behind the same alias</h3><p>Point an alias at an OpenAI-compatible, Anthropic or Gemini
         model instead, or give a local model a cloud fallback for the hours the GPU is busy with something else.</p></div>
@@ -41,17 +41,17 @@
         own speech-to-text, chat and text-to-speech models. The Chat has dictation, read-aloud and a voice mode.</p></div>
       <div class="point"><h3>Tools in one place</h3><p>Your MCP servers behind one <code>/mcp</code> endpoint, plus built-in
         tools that search library documentation and your own knowledge bases.</p></div>
-      <div class="point"><h3>A desktop app</h3><p>It lives in the tray and opens a native window on KDE Plasma. The same
-        dashboard works in any browser on your network.</p></div>
+      <div class="point"><h3>A desktop app</h3><p>It lives in the tray and opens its own window, which takes the frame, fonts
+        and colours of KDE Plasma. Bound to your network, the same dashboard works in a browser.</p></div>
     </div>
   </div>
 </section>
 
 <section class="band alt">
   <div class="wrap">
-    <h2>lmgw and the apps built on it</h2>
-    <p class="lead">The gateway holds the models. Apps around it are clients of its API, each a separate program you can
-      install or leave out.</p>
+    <h2>lmgw and its clients</h2>
+    <p class="lead">The gateway holds the models. Apps around it are clients of its API, separate programs to install
+      or leave out. The first, Kai, is in development.</p>
     <div class="cards">
       <a class="card" href="{{ get_url(path='@/lmgw.md') }}">
         <div class="card-head"><h3>lmgw</h3><span class="pill ok">Released · {{ latest.tag }}</span></div>
@@ -61,8 +61,8 @@
       </a>
       <a class="card" href="{{ get_url(path='@/kai.md') }}">
         <div class="card-head"><h3>Kai</h3><span class="pill amber">In development</span></div>
-        <p>A voice client for the Plasma desktop. Talk to your models from a global shortcut, see what it is doing in the
-          tray, and keep one ongoing conversation. Every model call goes through lmgw.</p>
+        <p>A voice client planned for the Plasma desktop: talk to your models from a global shortcut, see what it is doing
+          in the tray, and keep one ongoing conversation. Every model call goes through lmgw.</p>
         <span class="more">About Kai →</span>
       </a>
       <a class="card dashed" href="{{ get_url(path='@/docs/clients.md') }}">
@@ -79,8 +79,8 @@
   <div class="wrap split">
     <div>
       <h2>Built on an open API</h2>
-      <p class="lead">lmgw's own apps get no private channel. They use the same HTTP API as any other client: the OpenAI
-        and Anthropic dialects, the Realtime WebSocket and MCP.</p>
+      <p class="lead">Clients of lmgw get no private channel. The OpenAI and Anthropic dialects, the Realtime WebSocket and
+        MCP are open to any program today, and what Kai needs beyond them is being added as documented API.</p>
       <p class="muted">The API reference on this site is generated from the gateway's own OpenAPI document, the one a
         running lmgw serves at <code>/v1/openapi.json</code>.</p>
       <div class="actions" style="justify-content:flex-start">

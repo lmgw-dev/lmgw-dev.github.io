@@ -1,7 +1,7 @@
 # The lmgw-dev project site, https://lmgw-dev.github.io/ (README.md says how to build it).
 base_url = "https://lmgw-dev.github.io"
 title = "lmgw"
-description = "lmgw, the local model gateway: your own GPU behind OpenAI- and Anthropic-compatible APIs, with the cloud one alias away. A Linux desktop app, and the clients built on it."
+description = "lmgw, the local model gateway: your own GPU behind OpenAI- and Anthropic-compatible APIs, with the cloud one alias away. A Linux desktop app, and the clients of its API."
 default_language = "en"
 compile_sass = false
 build_search_index = false
