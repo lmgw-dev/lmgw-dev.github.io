@@ -93,7 +93,7 @@
 ```python
 from openai import OpenAI
 
-# Any key works until you require gateway keys in lmgw's settings.
+# Any key works until lmgw requires gateway keys.
 client = OpenAI(base_url="http://127.0.0.1:8787/v1", api_key="unused")
 
 reply = client.chat.completions.create(
