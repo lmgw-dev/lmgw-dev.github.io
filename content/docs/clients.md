@@ -28,7 +28,7 @@ stream = client.chat.completions.create(
     stream=True,
 )
 for chunk in stream:
-    if chunk.choices:  # the last chunk carries only the token usage
+    if chunk.choices:  # with stream_options.include_usage, the last chunk has only usage
         print(chunk.choices[0].delta.content or "", end="", flush=True)
 ```
 
