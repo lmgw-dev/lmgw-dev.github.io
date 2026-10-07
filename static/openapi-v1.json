@@ -8,7 +8,7 @@
             "items": {
               "properties": {
                 "content": {
-                  "description": "A string, or an array of blocks: {type:text,text}, {type:image,source:{type:base64,media_type,data} | {type:url,url}}, {type:tool_use,id,name,input}, {type:tool_result,tool_use_id,content,is_error}, {type:thinking,thinking,signature} (replayed; unsigned when lmgw itself produced it), {type:redacted_thinking} (accepted and dropped — this gateway's Anthropic egress never requests extended thinking with a redaction key). A custom tool without input_schema (a server tool) is refused with 400."
+                  "description": "A string, or an array of blocks: {type:text,text}, {type:image,source:{type:base64,media_type,data} | {type:url,url}}, {type:tool_use,id,name,input}, {type:tool_result,tool_use_id,content,is_error}, {type:thinking,thinking,signature} (replayed; unsigned when lmgw itself produced it), {type:redacted_thinking} (accepted and dropped: lmgw never asks an Anthropic upstream for thinking with a redaction key). A custom tool without input_schema (a server tool) is refused with 400."
                 },
                 "role": {
                   "enum": [
@@ -119,7 +119,7 @@
           "content": {
             "items": {
               "additionalProperties": true,
-              "description": "{type:text,text} | {type:tool_use,id,name,input}; a leading {type:thinking,thinking} block when the completion carried reasoning (unsigned — produced by lmgw, not Anthropic).",
+              "description": "{type:text,text} | {type:tool_use,id,name,input}; a leading {type:thinking,thinking} block when the completion carried reasoning (unsigned: produced by lmgw, not by Anthropic).",
               "type": "object"
             },
             "type": "array"
@@ -183,7 +183,7 @@
             "items": {
               "properties": {
                 "content": {
-                  "description": "A string, or an array of blocks: {type:text,text}, {type:image,source:{type:base64,media_type,data} | {type:url,url}}, {type:tool_use,id,name,input}, {type:tool_result,tool_use_id,content,is_error}, {type:thinking,thinking,signature} (replayed; unsigned when lmgw itself produced it), {type:redacted_thinking} (accepted and dropped — this gateway's Anthropic egress never requests extended thinking with a redaction key). A custom tool without input_schema (a server tool) is refused with 400."
+                  "description": "A string, or an array of blocks: {type:text,text}, {type:image,source:{type:base64,media_type,data} | {type:url,url}}, {type:tool_use,id,name,input}, {type:tool_result,tool_use_id,content,is_error}, {type:thinking,thinking,signature} (replayed; unsigned when lmgw itself produced it), {type:redacted_thinking} (accepted and dropped: lmgw never asks an Anthropic upstream for thinking with a redaction key). A custom tool without input_schema (a server tool) is refused with 400."
                 },
                 "role": {
                   "enum": [
@@ -238,7 +238,7 @@
             "description": "{type:auto|any|none|tool} (tool also carries name)."
           },
           "tools": {
-            "description": "Custom tools only (input_schema required) — a server tool (web_search, computer use, …) is refused with 400.",
+            "description": "Custom tools only (input_schema required); a server tool (web_search, computer use, …) is refused with 400.",
             "items": {
               "properties": {
                 "description": {
@@ -292,7 +292,7 @@
             "type": "string"
           },
           "max_input_tokens": {
-            "description": "Alias of context_window — the Anthropic SDK's own typed name for the same number.",
+            "description": "Alias of context_window, under the name the Anthropic SDK types it by.",
             "type": "integer"
           },
           "max_output_tokens": {
@@ -362,7 +362,7 @@
         "type": "object"
       },
       "AudioAlignmentsRequest": {
-        "description": "multipart/form-data only — lmgw's own route (task: \"align\" rows), not an OpenAI shape.",
+        "description": "multipart/form-data only — lmgw's own route (for models whose row has task \"align\"), not an OpenAI shape.",
         "properties": {
           "file": {
             "format": "binary",
@@ -393,7 +393,7 @@
             "type": "string"
           },
           "instructions": {
-            "description": "A speaking style, or the description a voice-design model builds its voice from (required there: 400 instructions_required without one, unless the row has a default). Dropped for a model that reads none — capabilities.speech.instructions says which, x-lmgw-speech says when.",
+            "description": "A speaking style, or the description a voice-design model builds its voice from (required there: 400 instructions_required without one, unless the row has a default). Dropped for a model that reads none: capabilities.speech.instructions says which, and the x-lmgw-speech response header says when.",
             "type": "string"
           },
           "language": {
@@ -410,7 +410,7 @@
             "type": "number"
           },
           "stream_format": {
-            "description": "Stream PCM16 (response_format pcm): speech.audio.delta events, or raw chunked PCM. A local model streams only when its row runs in streaming mode — an offline row is 400 streaming_unsupported before anything starts (capabilities.speech.streaming says which); x-lmgw-sample-rate states the PCM's rate.",
+            "description": "Streams PCM16 (with response_format pcm) as speech.audio.delta events (sse) or as raw chunked PCM (audio). A local model streams only when its row runs in streaming mode; an offline row is 400 streaming_unsupported before anything starts (capabilities.speech.streaming says which). The x-lmgw-sample-rate response header states the PCM's rate.",
             "enum": [
               "sse",
               "audio"
@@ -418,7 +418,7 @@
             "type": "string"
           },
           "voice": {
-            "description": "A row's own voice preset id, when it defines any (GET /v1/audio/voices). A voice-library clip with no transcript, for a model that cannot clone one without, is 400 voice_needs_transcript before anything starts (lmgw.needs_transcript in the voice list); send reference_text, or transcribe the clip in the Audio lab. A local model whose audio.cpp image lacks eSpeak NG is 400 audio_image_lacks_espeak.",
+            "description": "A row's own voice preset id, when it defines any (GET /v1/audio/voices). A voice-library clip with no transcript, for a model that cannot clone one without, is 400 voice_needs_transcript before anything starts (lmgw.needs_transcript in the voice list); send reference_text, or transcribe the clip in the dashboard's Audio lab. A local model whose audio.cpp image lacks eSpeak NG is 400 audio_image_lacks_espeak.",
             "type": "string"
           }
         },
@@ -475,7 +475,7 @@
         "type": "object"
       },
       "AudioTranscriptionsRequest": {
-        "description": "multipart/form-data (also accepted as application/json with the same fields, file base64-less — the multipart form is what real clients send).",
+        "description": "multipart/form-data (also accepted as application/json with the same fields but no upload: instead of file, audio names a clip by its path on the model server's own filesystem, e.g. /models/clip.wav, and the body is relayed with model rewritten; the multipart form is what real clients send).",
         "properties": {
           "file": {
             "format": "binary",
@@ -569,7 +569,7 @@
                 "type": "array"
               },
               "needs_transcript": {
-                "description": "The model cannot clone a library clip without its transcript: speech with an entry whose `transcript` is false is refused (400 voice_needs_transcript) until it has one (Audio lab → Transcribe).",
+                "description": "The model cannot clone a library clip without its transcript: speech with an entry whose `transcript` is false is refused (400 voice_needs_transcript) until it has one (the dashboard's Audio lab, Transcribe).",
                 "type": "boolean"
               },
               "source": {
@@ -750,6 +750,7 @@
             "type": "string"
           },
           "usage": {
+            "description": "Only with stream_options.include_usage: null on every frame but the last, whose choices is [] and which carries the request's usage.",
             "properties": {
               "completion_tokens": {
                 "type": "integer"
@@ -779,7 +780,10 @@
                 "type": "integer"
               }
             },
-            "type": "object"
+            "type": [
+              "object",
+              "null"
+            ]
           }
         },
         "type": "object"
@@ -810,15 +814,15 @@
                   "description": "A string, or an array of parts: {type:text,text}, {type:image_url,image_url:{url}} (a plain URL or a data: URI), {type:input_audio,input_audio:{data,format}} (data: URI, or raw base64 with format required). A tool message keeps only its text, as OpenAI defines it; any other part is dropped with a WARN naming it."
                 },
                 "name": {
-                  "description": "role: tool only, forwarded as the tool result's name.",
+                  "description": "role: tool only. Forwarded as the tool result's name.",
                   "type": "string"
                 },
                 "reasoning_content": {
-                  "description": "role: assistant only. Replayed as the leading reasoning part (also accepted spelled 'reasoning' — DeepSeek/llama.cpp vs. OpenRouter).",
+                  "description": "role: assistant only. Replayed as the leading reasoning part (also accepted spelled 'reasoning', as OpenRouter spells it; DeepSeek and llama.cpp use reasoning_content).",
                   "type": "string"
                 },
                 "role": {
-                  "description": "system and developer both become an IR system message; tool and function both become an IR tool-result message.",
+                  "description": "system and developer are both treated as a system message; tool and function are both treated as a tool-result message.",
                   "enum": [
                     "system",
                     "developer",
@@ -850,7 +854,7 @@
             "type": "array"
           },
           "model": {
-            "description": "An alias, a local model id, a candidate alias, or 'prefix/…' passthrough to an exposed upstream.",
+            "description": "An alias, a local model id, a candidate alias, or 'prefix/…' to pass through to an exposed upstream.",
             "type": "string"
           },
           "presence_penalty": {
@@ -878,6 +882,16 @@
           "stream": {
             "default": false,
             "type": "boolean"
+          },
+          "stream_options": {
+            "description": "With stream: true, include_usage ends the stream with a chunk whose choices is [] and that carries usage; every other chunk then has usage: null. Without it no chunk carries usage. Not forwarded: lmgw asks the upstream for usage itself, for its request log.",
+            "properties": {
+              "include_usage": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "type": "object"
           },
           "temperature": {
             "type": "number"
@@ -926,7 +940,7 @@
             "type": "array"
           },
           "top_k": {
-            "description": "Not standard OpenAI, but accepted — llama.cpp supports it.",
+            "description": "Not part of the OpenAI API, but accepted; llama.cpp supports it.",
             "type": "integer"
           },
           "top_p": {
@@ -953,7 +967,7 @@
             "type": "string"
           },
           "n_predict": {
-            "description": "llama.cpp spelling of max_tokens; folded into it on guarded or ladder rows.",
+            "description": "llama.cpp spelling of max_tokens; folded into it for local models with a guard or a ladder.",
             "type": "integer"
           },
           "prompt": {
@@ -971,7 +985,7 @@
         "type": "object"
       },
       "CountTokensRequest": {
-        "description": "Routed by model exactly like the chat endpoints — counting a cold local model's tokens starts its container. Now enforces the key's alias scope (§0 finding 3; a refusal is a logged 403 key_scope, a success is not logged). No budget applies, the key's or the gateway's: a count costs nothing.",
+        "description": "Routed by model exactly like the chat endpoints, so counting a cold local model's tokens starts its container. The key's alias scope applies: a refused count answers 403 key_scope and is logged; a successful count is not logged. No budget applies, neither the key's nor the gateway's: a count costs nothing.",
         "properties": {
           "input": {
             "type": "string"
@@ -1079,10 +1093,10 @@
         "type": "object"
       },
       "ImageEditsRequest": {
-        "description": "Refused unless the resolved row's edit pipeline flag is set.",
+        "description": "Refused unless the resolved model's row has its edit pipeline enabled.",
         "properties": {
           "image": {
-            "description": "One or more image files — proxy/image.rs relays every multipart field named image verbatim, with no cardinality check of its own.",
+            "description": "One or more image files. lmgw relays every multipart field named image verbatim, with no cardinality check of its own.",
             "items": {
               "format": "binary",
               "type": "string"
@@ -1130,7 +1144,7 @@
             "type": "string"
           },
           "prompt": {
-            "description": "May carry a trailing <sd_cpp_extra_args>{…}</sd_cpp_extra_args> block of raw sd.cpp CLI arguments — the api-types image_lab.rs builder is the reference for its contents.",
+            "description": "May carry a trailing <sd_cpp_extra_args>{…}</sd_cpp_extra_args> block of raw sd.cpp CLI arguments; the dashboard's Image lab builds this block and is the reference for its contents.",
             "type": "string"
           },
           "size": {
@@ -1249,7 +1263,7 @@
                 "type": "integer"
               },
               "lmgw_code": {
-                "description": "GatewayError::code(), e.g. gpu_hold, gpu_benchmark.",
+                "description": "lmgw's own machine-readable error code, e.g. gpu_hold, gpu_benchmark.",
                 "type": "string"
               },
               "message": {
@@ -1289,7 +1303,7 @@
             "type": "string"
           },
           "kind": {
-            "description": "builtin: lmgw's own toolsets (lmgw — owner credentials only — docs, kb); server: a registered MCP server; agent: a service agent's tools.",
+            "description": "builtin: lmgw's own toolsets (lmgw, for owner credentials only; docs; kb); server: a registered MCP server; agent: a service agent's tools.",
             "enum": [
               "builtin",
               "server",
@@ -1357,7 +1371,7 @@
                   "type": "string"
                 },
                 "kind": {
-                  "description": "builtin: lmgw's own toolsets (lmgw — owner credentials only — docs, kb); server: a registered MCP server; agent: a service agent's tools.",
+                  "description": "builtin: lmgw's own toolsets (lmgw, for owner credentials only; docs; kb); server: a registered MCP server; agent: a service agent's tools.",
                   "enum": [
                     "builtin",
                     "server",
@@ -1417,7 +1431,7 @@
       },
       "ModelCapabilities": {
         "additionalProperties": false,
-        "description": "The `capabilities` object of one model on `GET /v1/models` (design §2.1).\n\n`task`, `endpoints` and `source` are always present — they are what makes\nthe entry actionable at all (\"this id exists, here is where to send it,\nhere is how much to trust the rest\"). Everything else is absent unless a\nsource stated it.",
+        "description": "The `capabilities` object of one model on `GET /v1/models`.\n\n`task`, `endpoints` and `source` are always present — they are what makes\nthe entry actionable at all (\"this id exists, here is where to send it,\nhere is how much to trust the rest\"). Everything else is absent unless a\nsource stated it.",
         "properties": {
           "endpoints": {
             "description": "The lmgw routes that accept this model id.",
@@ -1456,7 +1470,7 @@
             ]
           },
           "source": {
-            "description": "Where the facts came from: `gguf+config`, `catalog`, `config`,\n`owner`.",
+            "description": "Where the facts came from: `gguf+config`, `catalog`, `config`, or\n`owner` (an alias's capabilities override).",
             "type": "string"
           },
           "speech": {
@@ -1468,7 +1482,7 @@
                 "type": "null"
               }
             ],
-            "description": "A text-to-speech model's expressive controls — what `instructions`,\ninline tags, `language` and `stream_format` do on it\n([`speech::SpeechCaps`]). A local audio row's is derived; a cloud\nalias has one only through the owner's override."
+            "description": "A text-to-speech model's expressive controls — what `instructions`,\ninline tags, `language` and `stream_format` do on it\n(the speech capabilities object). A local audio model's is derived; a\ncloud alias has one only through an alias's capabilities override."
           },
           "structured_output": {
             "anyOf": [
@@ -1481,7 +1495,7 @@
             ]
           },
           "task": {
-            "description": "`chat` | `embedding` | `rerank` | `tts` | `asr` | an audio.cpp task\nname | an image task | `realtime` (an OpenAI Realtime model, no lmgw\nroute). Drives [`endpoints`](Self::endpoints) ([`task::endpoints`]).",
+            "description": "`chat` | `embedding` | `rerank` | `tts` | `asr` | an audio.cpp task\nname | an image task | `realtime` (an OpenAI Realtime model, no lmgw\nroute). Determines `endpoints`.",
             "type": "string"
           },
           "tool_calls": {
@@ -1495,7 +1509,7 @@
             ]
           },
           "vision": {
-            "description": "`input_modalities` contains `image`. Redundant with the list on\npurpose: the consuming application reads this one boolean to decide\nwhether a session gets a screenshot tool. Absent exactly when\n`input_modalities` is absent.",
+            "description": "`input_modalities` contains `image`. Redundant with the list on\npurpose: a client can read this one boolean to decide whether to\nsend images, e.g. whether a session gets a screenshot tool. Absent\nexactly when `input_modalities` is absent.",
             "type": [
               "boolean",
               "null"
@@ -1523,7 +1537,7 @@
               "lmgw": {
                 "properties": {
                   "endpoints": {
-                    "description": "Generated from the route registry (§4.11) — every path here exists and carries the capability its own operation documents.",
+                    "description": "Every path listed here exists in this API and carries the capability its own operation documents.",
                     "properties": {
                       "anthropic": {
                         "items": {
@@ -1601,7 +1615,7 @@
               "lmgw": {
                 "properties": {
                   "endpoints": {
-                    "description": "Generated from the route registry (§4.11) — every path here exists and carries the capability its own operation documents.",
+                    "description": "Every path listed here exists in this API and carries the capability its own operation documents.",
                     "properties": {
                       "anthropic": {
                         "items": {
@@ -1657,7 +1671,7 @@
           "error": {
             "properties": {
               "code": {
-                "description": "GatewayError::code(), lmgw's own machine word (e.g. gpu_hold, gpu_benchmark), not the HTTP status.",
+                "description": "lmgw's own machine-readable error code (e.g. gpu_hold, gpu_benchmark), not the HTTP status.",
                 "type": "string"
               },
               "message": {
@@ -1697,7 +1711,7 @@
             "type": "integer"
           },
           "created": {
-            "description": "Stable per gateway process, not now() on every poll — the catalog's own timestamp when it has one.",
+            "description": "Stable for the life of the gateway process rather than the time of each request; the catalog's own timestamp when it has one.",
             "type": "integer"
           },
           "id": {
@@ -1744,7 +1758,7 @@
       },
       "ReasoningCaps": {
         "additionalProperties": false,
-        "description": "Reasoning / thinking support and how a request controls it (design §2.1,\n§3.2, §4).",
+        "description": "Reasoning / thinking support and how a request controls it.",
         "properties": {
           "budget_tokens": {
             "description": "The configured default thinking-token budget, when set and non-zero\n(a zero budget is published as `enabled: false`, not as a budget).",
@@ -1917,9 +1931,7 @@
             "type": "string"
           },
           "store": {
-            "enum": [
-              false
-            ],
+            "description": "Whether lmgw stored this response, so a later request can continue from it with previous_response_id.",
             "type": "boolean"
           },
           "usage": {
@@ -2015,7 +2027,7 @@
         "additionalProperties": true,
         "properties": {
           "background": {
-            "description": "Refused: responses always run synchronously here.",
+            "description": "Refused: responses always run synchronously.",
             "type": "boolean"
           },
           "include": {
@@ -2051,7 +2063,7 @@
             "type": "boolean"
           },
           "previous_response_id": {
-            "description": "Refused: this stage stores nothing, so a chained call would silently lose the earlier conversation.",
+            "description": "Continues a stored response: its conversation, tool calls and results included, goes ahead of this call's input, and mcp_approval_response items settle the calls it stopped at. 400 while the gateway's response store is switched off; 404 when no stored response has this id (it was evicted, or created with storing off).",
             "type": "string"
           },
           "reasoning": {
@@ -2064,7 +2076,7 @@
             "type": "object"
           },
           "store": {
-            "description": "This stage stores nothing regardless of the value sent; the response object always answers store: false so a client can see previous_response_id will not work before it tries.",
+            "description": "Whether lmgw keeps this response, so a later call can continue it with previous_response_id (default true). Storing also needs the gateway's response store, which is on by default: a request can turn storing off, never on. The response object's store says whether this response was kept, so a client can see up front whether previous_response_id will work. On an upstream that implements the Responses API itself the body goes there as sent, and storing is the provider's.",
             "type": "boolean"
           },
           "stream": {
@@ -2139,7 +2151,7 @@
                       "description": "\"never\" (default) | \"always\" | {never:{tool_names}, always:{tool_names}}. read_only is refused, as in allowed_tools."
                     },
                     "server_label": {
-                      "description": "Matches a registered MCP server's own tool prefix (or its name when it has none) — lmgw resolves this against its own servers, never a client-supplied server_url.",
+                      "description": "Matches a registered MCP server's own tool prefix (or its name when it has none) — lmgw resolves this against its own servers, never against a client-supplied server_url.",
                       "type": "string"
                     },
                     "type": {
@@ -2187,7 +2199,7 @@
             ]
           },
           "instructions": {
-            "description": "What `instructions` do: `none` (dropped — said in `x-lmgw-speech`),\n`style` (a speaking style for the voice), `voice_design` (the voice\nis designed from them), `passthrough` (sent; the model reads them —\nits spec declares an instruction option, or lmgw's family table says\nits engine reads one anyway — and decides what they do).",
+            "description": "What `instructions` do: `none` (dropped — said in `x-lmgw-speech`),\n`style` (a speaking style for the voice), `voice_design` (the voice\nis designed from them), `passthrough` (sent; the model reads them —\nit declares an instruction option, or lmgw knows its engine reads\none anyway — and decides what they do).",
             "type": [
               "string",
               "null"
@@ -2235,7 +2247,7 @@
       },
       "StructuredOutputCaps": {
         "additionalProperties": false,
-        "description": "`response_format` support (design §2.1).",
+        "description": "`response_format` support.",
         "properties": {
           "json_object": {
             "type": [
@@ -2259,7 +2271,7 @@
           },
           "request": {
             "additionalProperties": true,
-            "description": "Relayed to audio.cpp's generic task endpoint untouched — its shape is the task's own, not modeled here.",
+            "description": "Relayed to audio.cpp's generic task endpoint untouched; its shape is the task's own and is not modeled here.",
             "type": "object"
           }
         },
@@ -2331,7 +2343,7 @@
       },
       "TokenizeRequest": {
         "additionalProperties": true,
-        "description": "Every key but model is forwarded to the backend's own /tokenize verbatim. Refused with 501 not_supported_error on any backend but a real llama-server — an id from a tokenizer the backend does not run would be a hidden approximation (§10 choice 6).",
+        "description": "Every key but model is forwarded to the backend's own /tokenize verbatim. Refused with 501 not_supported_error on any backend but a real llama-server — an id from a tokenizer the backend does not run would be a hidden approximation.",
         "properties": {
           "add_special": {
             "default": false,
@@ -2371,7 +2383,7 @@
       },
       "ToolCallCaps": {
         "additionalProperties": false,
-        "description": "Tool-calling support (design §2.1, §3.4).",
+        "description": "Tool-calling support.",
         "properties": {
           "format": {
             "description": "The native syntax family the template renders (`qwen-xml`,\n`hermes-json`, …), `provider` for cloud, `unknown` when the template\nrenders tools with none of the known markers. Informational.",
@@ -2431,7 +2443,7 @@
         "operationId": "delete_mcp",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -2492,7 +2504,7 @@
         "operationId": "get_mcp",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -2561,11 +2573,11 @@
         "x-lmgw-writes": false
       },
       "post": {
-        "description": "MCP Streamable HTTP (mcp/ingress.rs): single JSON-RPC request/notification/response per POST, no batching. initialize negotiates MCP-Protocol-Version and assigns Mcp-Session-Id, which every later request on the session must carry; a notification answers 202 with no body. tools/list and tools/call reach the registered southbound MCP servers' tools, namespaced <prefix>__.",
+        "description": "MCP Streamable HTTP: single JSON-RPC request/notification/response per POST, no batching. initialize negotiates MCP-Protocol-Version and assigns Mcp-Session-Id, which every later request on the session must carry; a notification answers 202 with no body. tools/list and tools/call reach the registered southbound MCP servers' tools, namespaced <prefix>__.",
         "operationId": "post_mcp",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -2658,7 +2670,7 @@
         "operationId": "delete_mcp_admin",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -2719,7 +2731,7 @@
         "operationId": "get_mcp_admin",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -2790,11 +2802,11 @@
     },
     "/tokenize": {
       "post": {
-        "description": "llama.cpp's own /tokenize, for llama.cpp clients (§5.3): the client object is forwarded to the backend's own /tokenize with model rewritten, and the answer — token ids, or {id,piece} with with_pieces — comes back verbatim, the backend's own errors included (but an upstream 401/403 is a 502: that is lmgw's credential). The body is read as JSON whatever its Content-Type, as llama-server reads it. 501 not_supported_error on any backend that is not a real llama-server: an id from a tokenizer the backend does not run would be a hidden approximation. Enforces the key's alias scope (a logged 403 key_scope); no budget applies. Errors are llama.cpp-shaped, except the shared /v1 layers' own: the gate's 401, 403 and 429, and the 413 for a declared Content-Length over max_body_mb, which are OpenAI-shaped.",
+        "description": "llama.cpp's own /tokenize, for llama.cpp clients: the client object is forwarded to the backend's own /tokenize with model rewritten, and the answer — token ids, or {id,piece} with with_pieces — comes back verbatim, the backend's own errors included (but an upstream 401/403 is a 502: that is lmgw's credential). The body is read as JSON whatever its Content-Type, as llama-server reads it. 501 not_supported_error on any backend that is not a real llama-server: an id from a tokenizer the backend does not run would be a hidden approximation. Enforces the key's alias scope (a logged 403 key_scope); no budget applies. Errors are llama.cpp-shaped, except the shared /v1 layers' own: the gate's 401, 403 and 429, and the 413 for a declared Content-Length over max_body_mb, which are OpenAI-shaped.",
         "operationId": "post_tokenize",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -2830,19 +2842,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -2898,7 +2910,7 @@
         "operationId": "post_v1_audio_alignments",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -2930,19 +2942,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -2997,7 +3009,7 @@
         "operationId": "post_v1_audio_speech",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -3066,19 +3078,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -3091,13 +3103,13 @@
                 }
               },
               "x-lmgw-sample-rate": {
-                "description": "RESPONSE: on a streamed POST /v1/audio/speech (stream_format sse or audio) to a local audio model, the sample rate of its PCM16 in Hz — the stream has no header of its own. Learned from the model's last WAV answer through lmgw (also capabilities.speech.sample_rate); absent until it has answered one since lmgw started.",
+                "description": "On a streamed POST /v1/audio/speech (stream_format sse or audio) to a local audio model, the sample rate of its PCM16 in Hz; the stream has no header of its own. lmgw learns it from the model's last WAV answer (it is also capabilities.speech.sample_rate) and omits it until the model has answered one since lmgw started.",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-speech": {
-                "description": "RESPONSE: on POST /v1/audio/speech, what lmgw changed in the request so the model understands it, '; '-separated: voice=options.voice_id (a voice the model ships, which this family reads from options.voice_id — MagpieTTS), voice=preset->options.voice_id (the same for a preset's voice id), voice=<name> (a shipped voice sent in the model's own spelling), language=<asked>-><sent> (the language in the model's own vocabulary, e.g. de->german for Qwen3-TTS, en->en-us for Kokoro), instructions=options.instruct (moved where the family reads them), instructions=also:options.instruct or instructions=also:options.instruction (the model's default request options describe the voice under that other key, which the engine would merge in beside the request's and refuse as conflicting — the request's text went there too, so it replaces the default), instructions=dropped (the model reads none — capabilities.speech.instructions is none), tags=mapped:<n>,stripped:<n> (inline tags in input rewritten into the model's spelling, or removed so they are never read out). The voice and language parts apply to local audio models only. Absent when the request went as it came; input changes only for its inline tags.",
+                "description": "On POST /v1/audio/speech, what lmgw changed in the request so the model understands it; a '; '-separated list. voice=options.voice_id: a voice the model ships, which this family (MagpieTTS) reads from options.voice_id. voice=preset->options.voice_id: the same for a preset's voice id. voice=<name>: a shipped voice sent in the model's own spelling. language=<asked>-><sent>: the language in the model's own vocabulary, e.g. de->german for Qwen3-TTS, en->en-us for Kokoro. instructions=options.instruct: instructions moved to where the family reads them. instructions=also:options.instruct or instructions=also:options.instruction: the model's default request options describe the voice under that other key, which the engine would merge in beside the request's and refuse as conflicting, so the request's text went there too and replaces the default. instructions=dropped: the model reads none (capabilities.speech.instructions is none). tags=mapped:<n>,stripped:<n>: inline tags in input were rewritten into the model's spelling, or removed so they are never read out. The voice and language parts apply to local audio models only. Absent when the request went as it came; input changes only for its inline tags.",
                 "schema": {
                   "type": "string"
                 }
@@ -3146,7 +3158,7 @@
         "operationId": "post_v1_audio_transcriptions",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -3178,19 +3190,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -3246,7 +3258,7 @@
         "operationId": "post_v1_audio_transcriptions_details",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -3278,19 +3290,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -3368,7 +3380,7 @@
             }
           },
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -3390,19 +3402,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -3415,7 +3427,7 @@
                 }
               },
               "x-lmgw-voices-source": {
-                "description": "RESPONSE: on GET /v1/audio/voices, where the list came from: config (a local audio model answered from lmgw's own catalog — its presets, the voices its package ships, its embeddings and the voice library — without starting it) or engine (the model's own server: a remote upstream, or a local container with ?probe=engine, which starts it if it is down).",
+                "description": "On GET /v1/audio/voices, where the list came from. config: a local audio model answered from lmgw's own catalog (its presets, the voices its package ships, its embeddings and the voice library) without being started. engine: the model's own server answered, either a remote upstream or a local container with ?probe=engine, which starts the container if it is down.",
                 "schema": {
                   "enum": [
                     "config",
@@ -3464,11 +3476,11 @@
     },
     "/v1/chat/completions": {
       "post": {
-        "description": "The chat-completions ingress this gateway understands (ingress/openai.rs) plus lmgw's own reasoning controls and chat_template_kwargs passthrough. `model` may be an alias, a local model id, a candidate alias, or an exposed upstream's `prefix/…` id. An anthropic-beta header is forwarded when the route is an Anthropic upstream.",
+        "description": "The chat-completions API, plus lmgw's own reasoning controls and chat_template_kwargs passthrough. `model` may be an alias, a local model id, a candidate alias, or an exposed upstream's `prefix/…` id. An anthropic-beta header is forwarded when the route is an Anthropic upstream.",
         "operationId": "post_v1_chat_completions",
         "parameters": [
           {
-            "description": "on|off — per-request thinking switch; wins over body fields. On a cloud model, off goes out in the form the model takes: no reasoning control where it has none, its lowest level where it cannot stop (x-lmgw-reasoning-ignored then says enabled). An off never ends in an error: a refused one is retried with what the refusal names and, failing that, with no reasoning control, so a model that cannot run without reasoning answers with its default reasoning. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
+            "description": "on|off: per-request thinking switch; it wins over body fields. On a cloud model, off goes out in the form the model takes: no reasoning control where the model has none, its lowest level where it cannot stop (x-lmgw-reasoning-ignored then lists enabled). An off never ends in an error: a refused one is retried with what the refusal names and, failing that, with no reasoning control, so a model that cannot run without reasoning answers with its default reasoning. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
             "in": "header",
             "name": "x-lmgw-reasoning",
             "required": false,
@@ -3482,7 +3494,7 @@
             "x-lmgw-audience": "client"
           },
           {
-            "description": "an effort level (see capabilities.reasoning.levels of the model); 'none' = off. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
+            "description": "An effort level (see capabilities.reasoning.levels of the model); 'none' turns reasoning off. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
             "in": "header",
             "name": "x-lmgw-reasoning-effort",
             "required": false,
@@ -3492,7 +3504,7 @@
             "x-lmgw-audience": "client"
           },
           {
-            "description": "integer thinking-token budget; 0 = off. Expressible on llama.cpp, Gemini and budget-style Anthropic models only. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
+            "description": "Integer thinking-token budget; 0 turns reasoning off. Expressible on llama.cpp, Gemini and budget-style Anthropic models only. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
             "in": "header",
             "name": "x-lmgw-reasoning-budget",
             "required": false,
@@ -3502,7 +3514,7 @@
             "x-lmgw-audience": "client"
           },
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -3548,19 +3560,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -3573,31 +3585,31 @@
                 }
               },
               "x-lmgw-images-omitted": {
-                "description": "RESPONSE: next to x-lmgw-fallback, how many of the request's images went to the fallback that answered as text placeholders, because its capabilities say it cannot see ('[image/png image, N base64 bytes — omitted: the answering model cannot see images]'); the model reads the placeholder, the client this count. On /v1/responses it counts the images the run opened with. Absent when every image was sent, and on a route the client named itself, which always gets its images.",
+                "description": "Sent next to x-lmgw-fallback: the number of the request's images that went to the answering fallback as text placeholders because its capabilities say it cannot see ('[image/png image, N base64 bytes — omitted: the answering model cannot see images]'). The model reads the placeholder; the client reads this count. On /v1/responses it counts the images the run opened with. Absent when every image was sent, and on a route the client named itself, which always gets its images.",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-max-tokens-clamped": {
-                "description": "RESPONSE: the max_tokens lmgw lowered the request's cap to, because a ladder rung or a guarded shared-KV-pool model's n_predict is the ceiling every request on it must respect. Absent when nothing was lowered — a missing max_tokens is filled, not clamped, and a value already under the ceiling is kept exactly.",
+                "description": "The max_tokens value lmgw lowered the request's cap to, because the n_predict of a ladder rung, or of a guarded shared-KV-pool model, is a ceiling every request on it must respect. Absent when nothing was lowered: a missing max_tokens is filled, not clamped, and a value already under the ceiling is kept exactly.",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-max-tokens-defaulted": {
-                "description": "RESPONSE: the max_tokens lmgw chose because the request set none and the route (an Anthropic upstream) requires one: the catalog's published maximum when streaming, 4096 when not streaming (the provider refuses non-streamed requests that could run too long).",
+                "description": "The max_tokens value lmgw chose because the request set none and the route (an Anthropic upstream) requires one: the catalog's published maximum when streaming, 4096 when not streaming (the provider refuses non-streamed requests that could run too long).",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-max-tokens-raised": {
-                "description": "RESPONSE: the max_tokens lmgw raised the request's cap to, because the requested thinking budget would not fit underneath it.",
+                "description": "The max_tokens value lmgw raised the request's cap to, because the requested thinking budget would not fit underneath it.",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-reasoning-ignored": {
-                "description": "RESPONSE: comma-separated controls (enabled, effort, budget) the route could not express — enabled also when an off went out as no control or as the model's lowest level, because the model cannot take the off itself, or the provider refused every form of off and the model answered with its default reasoning; absent when everything was applied.",
+                "description": "Comma-separated list of the reasoning controls (enabled, effort, budget) the route could not express. enabled is also listed when an off went out as no control or as the model's lowest level, either because the model cannot take the off itself or because the provider refused every form of off and the model answered with its default reasoning. Absent when every control was applied.",
                 "schema": {
                   "enum": [
                     "enabled",
@@ -3608,7 +3620,7 @@
                 }
               },
               "x-lmgw-rung": {
-                "description": "RESPONSE: on a ladder model, the rung that answered (or refused) the request: '<k>/<n>; ctx=<per-slot context>; gguf=<weights file>', counted from 1 (the gguf part is left off when the file name cannot be a header value). A request whose prompt plus max output does not fit the running rung makes the model climb to the smallest rung that fits before it is answered; on /v1/responses it names the rung running when the run opened (a unary answer one of whose turns the fallback answered carries x-lmgw-fallback instead; a stream's headers leave before its turns run). Absent on models without a ladder and on responses a fallback answered.",
+                "description": "On a ladder model, the rung that answered (or refused) the request, as '<k>/<n>; ctx=<per-slot context>; gguf=<weights file>', counted from 1 (the gguf part is left off when the file name cannot be a header value). A request whose prompt plus max output does not fit the running rung makes the model climb to the smallest rung that fits before it answers. On /v1/responses it names the rung running when the run opened; a unary answer one of whose turns the fallback answered carries x-lmgw-fallback instead, and a stream's headers are sent before its turns run. Absent on models without a ladder and on responses a fallback answered.",
                 "schema": {
                   "type": "string"
                 }
@@ -3658,11 +3670,11 @@
     },
     "/v1/completions": {
       "post": {
-        "description": "The legacy text-completions shape (proxy/legacy.rs). Refuses a non-OpenAI-protocol upstream with 400 rather than sending it a request its own API cannot answer. A missing model is a 400 (missing 'model'), as on every other ingress.",
+        "description": "The legacy text-completions shape. Refuses a non-OpenAI-protocol upstream with 400 rather than sending it a request its own API cannot answer. A missing model is a 400 (missing 'model'), as on every other ingress.",
         "operationId": "post_v1_completions",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -3703,19 +3715,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -3728,13 +3740,13 @@
                 }
               },
               "x-lmgw-max-tokens-clamped": {
-                "description": "RESPONSE: the max_tokens lmgw lowered the request's cap to, because a ladder rung or a guarded shared-KV-pool model's n_predict is the ceiling every request on it must respect. Absent when nothing was lowered — a missing max_tokens is filled, not clamped, and a value already under the ceiling is kept exactly.",
+                "description": "The max_tokens value lmgw lowered the request's cap to, because the n_predict of a ladder rung, or of a guarded shared-KV-pool model, is a ceiling every request on it must respect. Absent when nothing was lowered: a missing max_tokens is filled, not clamped, and a value already under the ceiling is kept exactly.",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-rung": {
-                "description": "RESPONSE: on a ladder model, the rung that answered (or refused) the request: '<k>/<n>; ctx=<per-slot context>; gguf=<weights file>', counted from 1 (the gguf part is left off when the file name cannot be a header value). A request whose prompt plus max output does not fit the running rung makes the model climb to the smallest rung that fits before it is answered; on /v1/responses it names the rung running when the run opened (a unary answer one of whose turns the fallback answered carries x-lmgw-fallback instead; a stream's headers leave before its turns run). Absent on models without a ladder and on responses a fallback answered.",
+                "description": "On a ladder model, the rung that answered (or refused) the request, as '<k>/<n>; ctx=<per-slot context>; gguf=<weights file>', counted from 1 (the gguf part is left off when the file name cannot be a header value). A request whose prompt plus max output does not fit the running rung makes the model climb to the smallest rung that fits before it answers. On /v1/responses it names the rung running when the run opened; a unary answer one of whose turns the fallback answered carries x-lmgw-fallback instead, and a stream's headers are sent before its turns run. Absent on models without a ladder and on responses a fallback answered.",
                 "schema": {
                   "type": "string"
                 }
@@ -3784,11 +3796,11 @@
     },
     "/v1/count_tokens": {
       "post": {
-        "description": "lmgw's own universal counter (proxy/count.rs): routed by model exactly like the chat endpoints, so counting on a cold local model starts its container. x-lmgw-count-approximate explains tokenizer_guess (an OpenAI-protocol upstream tiktoken cannot identify) and message_framing (an Anthropic/Gemini upstream counts messages, so the text went as one user turn).",
+        "description": "lmgw's own universal token counter: routed by model exactly like the chat endpoints, so counting on a cold local model starts its container. x-lmgw-count-approximate explains tokenizer_guess (an OpenAI-protocol upstream tiktoken cannot identify) and message_framing (an Anthropic/Gemini upstream counts messages, so the text went as one user turn).",
         "operationId": "post_v1_count_tokens",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -3824,13 +3836,13 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-count-approximate": {
-                "description": "RESPONSE: on the token counters, why the number is not exactly what the backend would count for this request, comma-separated: flattened (the request's structure was counted as plain text — chat template, tool-definition and per-message overhead are not included, so the real prompt is larger), tokenizer_guess (the backend's tokenizer is unknown; counted with tiktoken o200k_base), media_bound (images counted at the model's per-image upper bound), media_omitted (image or audio parts are not in the number), message_framing (/v1/count_tokens: the backend counts messages, so the text was counted as one user message, framing included). Absent when the count is exact.",
+                "description": "On the token counters, why the number is not exactly what the backend would count for this request; a comma-separated list. flattened: the request's structure was counted as plain text, so chat template, tool-definition and per-message overhead are not included and the real prompt is larger. tokenizer_guess: the backend's tokenizer is unknown, so the count uses tiktoken o200k_base. media_bound: images are counted at the model's per-image upper bound. media_omitted: image or audio parts are not in the number. message_framing: on /v1/count_tokens, the backend counts messages, so the text was counted as one user message, framing included. Absent when the count is exact.",
                 "schema": {
                   "enum": [
                     "flattened",
@@ -3843,13 +3855,13 @@
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -3905,7 +3917,7 @@
         "operationId": "post_v1_embeddings",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -3941,19 +3953,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -4009,7 +4021,7 @@
         "operationId": "post_v1_images_edits",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -4041,19 +4053,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -4105,11 +4117,11 @@
     },
     "/v1/images/generations": {
       "post": {
-        "description": "OpenAI's images shape; sd.cpp CLI arguments may ride along in a trailing <sd_cpp_extra_args>{…}</sd_cpp_extra_args> block on prompt (the api-types image_lab.rs builder is the reference for its contents). Answers base64 only (b64_json), never a URL.",
+        "description": "OpenAI's images shape; sd.cpp CLI arguments may ride along in a trailing <sd_cpp_extra_args>{…}</sd_cpp_extra_args> block on prompt (the dashboard's Image lab builds this block and is the reference for its contents). Answers base64 only (b64_json), never a URL.",
         "operationId": "post_v1_images_generations",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -4146,19 +4158,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -4214,7 +4226,7 @@
         "operationId": "get_v1_mcp_servers",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -4272,7 +4284,7 @@
     },
     "/v1/mcp/servers/{label}": {
       "get": {
-        "description": "One label's tools, exactly as a /v1/realtime session's mcp_list_tools item lists them (the server's own tool names, description always a string), under the caller's tool scope and the owner's per-tool switches. Connects that one server if it is not up (up to the lazy-list budget). 404 for a label this caller may not use, naming the available ones; 502 when the server cannot be listed.",
+        "description": "One label's tools, exactly as a /v1/realtime session's mcp_list_tools item lists them (the server's own tool names, description always a string), under the caller's tool scope and the per-tool switches. Connects that one server if it is not up (up to the lazy-list budget). 404 for a label this caller may not use, naming the available ones; 502 when the server cannot be listed.",
         "operationId": "get_v1_mcp_servers_label",
         "parameters": [
           {
@@ -4284,7 +4296,7 @@
             }
           },
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -4342,11 +4354,11 @@
     },
     "/v1/messages": {
       "post": {
-        "description": "The /v1/messages ingress this gateway understands (ingress/anthropic.rs:14). A server tool (no input_schema) is refused with 400; redacted_thinking is accepted and dropped. A missing max_tokens is filled in rather than refused (x-lmgw-max-tokens-defaulted). anthropic-beta reaches an Anthropic upstream as one header, merged with the upstream row's own; other protocols have no equivalent and are sent none.",
+        "description": "The Anthropic Messages API. A server tool (no input_schema) is refused with 400; redacted_thinking is accepted and dropped. A missing max_tokens is filled in rather than refused (x-lmgw-max-tokens-defaulted). anthropic-beta reaches an Anthropic upstream as one header, merged with the upstream row's own; other protocols have no equivalent and are sent none.",
         "operationId": "post_v1_messages",
         "parameters": [
           {
-            "description": "on|off — per-request thinking switch; wins over body fields. On a cloud model, off goes out in the form the model takes: no reasoning control where it has none, its lowest level where it cannot stop (x-lmgw-reasoning-ignored then says enabled). An off never ends in an error: a refused one is retried with what the refusal names and, failing that, with no reasoning control, so a model that cannot run without reasoning answers with its default reasoning. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
+            "description": "on|off: per-request thinking switch; it wins over body fields. On a cloud model, off goes out in the form the model takes: no reasoning control where the model has none, its lowest level where it cannot stop (x-lmgw-reasoning-ignored then lists enabled). An off never ends in an error: a refused one is retried with what the refusal names and, failing that, with no reasoning control, so a model that cannot run without reasoning answers with its default reasoning. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
             "in": "header",
             "name": "x-lmgw-reasoning",
             "required": false,
@@ -4360,7 +4372,7 @@
             "x-lmgw-audience": "client"
           },
           {
-            "description": "an effort level (see capabilities.reasoning.levels of the model); 'none' = off. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
+            "description": "An effort level (see capabilities.reasoning.levels of the model); 'none' turns reasoning off. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
             "in": "header",
             "name": "x-lmgw-reasoning-effort",
             "required": false,
@@ -4370,7 +4382,7 @@
             "x-lmgw-audience": "client"
           },
           {
-            "description": "integer thinking-token budget; 0 = off. Expressible on llama.cpp, Gemini and budget-style Anthropic models only. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
+            "description": "Integer thinking-token budget; 0 turns reasoning off. Expressible on llama.cpp, Gemini and budget-style Anthropic models only. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
             "in": "header",
             "name": "x-lmgw-reasoning-budget",
             "required": false,
@@ -4380,7 +4392,7 @@
             "x-lmgw-audience": "client"
           },
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -4438,19 +4450,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -4463,31 +4475,31 @@
                 }
               },
               "x-lmgw-images-omitted": {
-                "description": "RESPONSE: next to x-lmgw-fallback, how many of the request's images went to the fallback that answered as text placeholders, because its capabilities say it cannot see ('[image/png image, N base64 bytes — omitted: the answering model cannot see images]'); the model reads the placeholder, the client this count. On /v1/responses it counts the images the run opened with. Absent when every image was sent, and on a route the client named itself, which always gets its images.",
+                "description": "Sent next to x-lmgw-fallback: the number of the request's images that went to the answering fallback as text placeholders because its capabilities say it cannot see ('[image/png image, N base64 bytes — omitted: the answering model cannot see images]'). The model reads the placeholder; the client reads this count. On /v1/responses it counts the images the run opened with. Absent when every image was sent, and on a route the client named itself, which always gets its images.",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-max-tokens-clamped": {
-                "description": "RESPONSE: the max_tokens lmgw lowered the request's cap to, because a ladder rung or a guarded shared-KV-pool model's n_predict is the ceiling every request on it must respect. Absent when nothing was lowered — a missing max_tokens is filled, not clamped, and a value already under the ceiling is kept exactly.",
+                "description": "The max_tokens value lmgw lowered the request's cap to, because the n_predict of a ladder rung, or of a guarded shared-KV-pool model, is a ceiling every request on it must respect. Absent when nothing was lowered: a missing max_tokens is filled, not clamped, and a value already under the ceiling is kept exactly.",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-max-tokens-defaulted": {
-                "description": "RESPONSE: the max_tokens lmgw chose because the request set none and the route (an Anthropic upstream) requires one: the catalog's published maximum when streaming, 4096 when not streaming (the provider refuses non-streamed requests that could run too long).",
+                "description": "The max_tokens value lmgw chose because the request set none and the route (an Anthropic upstream) requires one: the catalog's published maximum when streaming, 4096 when not streaming (the provider refuses non-streamed requests that could run too long).",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-max-tokens-raised": {
-                "description": "RESPONSE: the max_tokens lmgw raised the request's cap to, because the requested thinking budget would not fit underneath it.",
+                "description": "The max_tokens value lmgw raised the request's cap to, because the requested thinking budget would not fit underneath it.",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-reasoning-ignored": {
-                "description": "RESPONSE: comma-separated controls (enabled, effort, budget) the route could not express — enabled also when an off went out as no control or as the model's lowest level, because the model cannot take the off itself, or the provider refused every form of off and the model answered with its default reasoning; absent when everything was applied.",
+                "description": "Comma-separated list of the reasoning controls (enabled, effort, budget) the route could not express. enabled is also listed when an off went out as no control or as the model's lowest level, either because the model cannot take the off itself or because the provider refused every form of off and the model answered with its default reasoning. Absent when every control was applied.",
                 "schema": {
                   "enum": [
                     "enabled",
@@ -4498,7 +4510,7 @@
                 }
               },
               "x-lmgw-rung": {
-                "description": "RESPONSE: on a ladder model, the rung that answered (or refused) the request: '<k>/<n>; ctx=<per-slot context>; gguf=<weights file>', counted from 1 (the gguf part is left off when the file name cannot be a header value). A request whose prompt plus max output does not fit the running rung makes the model climb to the smallest rung that fits before it is answered; on /v1/responses it names the rung running when the run opened (a unary answer one of whose turns the fallback answered carries x-lmgw-fallback instead; a stream's headers leave before its turns run). Absent on models without a ladder and on responses a fallback answered.",
+                "description": "On a ladder model, the rung that answered (or refused) the request, as '<k>/<n>; ctx=<per-slot context>; gguf=<weights file>', counted from 1 (the gguf part is left off when the file name cannot be a header value). A request whose prompt plus max output does not fit the running rung makes the model climb to the smallest rung that fits before it answers. On /v1/responses it names the rung running when the run opened; a unary answer one of whose turns the fallback answered carries x-lmgw-fallback instead, and a stream's headers are sent before its turns run. Absent on models without a ladder and on responses a fallback answered.",
                 "schema": {
                   "type": "string"
                 }
@@ -4548,11 +4560,11 @@
     },
     "/v1/messages/count_tokens": {
       "post": {
-        "description": "The Anthropic SDKs' messages.count_tokens() (§5.2): on an Anthropic-protocol upstream, the client body is sent through verbatim (only model replaced), with its anthropic-beta flags, so server tools and new fields count exactly. x-lmgw-count-approximate explains any other route's approximation. Enforces the key's alias scope like every other counter (a refusal is a logged 403 key_scope, a success is not logged); no budget applies, the key's or the gateway's, since a count costs nothing.",
+        "description": "The Anthropic SDKs' messages.count_tokens(): on an Anthropic-protocol upstream, the client body is sent through verbatim (only model replaced), with its anthropic-beta flags, so server tools and new fields count exactly. x-lmgw-count-approximate explains any other route's approximation. Enforces the key's alias scope like every other counter (a refusal is a logged 403 key_scope, a success is not logged); no budget applies, the key's or the gateway's, since a count costs nothing.",
         "operationId": "post_v1_messages_count_tokens",
         "parameters": [
           {
-            "description": "on|off — per-request thinking switch; wins over body fields. On a cloud model, off goes out in the form the model takes: no reasoning control where it has none, its lowest level where it cannot stop (x-lmgw-reasoning-ignored then says enabled). An off never ends in an error: a refused one is retried with what the refusal names and, failing that, with no reasoning control, so a model that cannot run without reasoning answers with its default reasoning. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
+            "description": "on|off: per-request thinking switch; it wins over body fields. On a cloud model, off goes out in the form the model takes: no reasoning control where the model has none, its lowest level where it cannot stop (x-lmgw-reasoning-ignored then lists enabled). An off never ends in an error: a refused one is retried with what the refusal names and, failing that, with no reasoning control, so a model that cannot run without reasoning answers with its default reasoning. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
             "in": "header",
             "name": "x-lmgw-reasoning",
             "required": false,
@@ -4566,7 +4578,7 @@
             "x-lmgw-audience": "client"
           },
           {
-            "description": "an effort level (see capabilities.reasoning.levels of the model); 'none' = off. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
+            "description": "An effort level (see capabilities.reasoning.levels of the model); 'none' turns reasoning off. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
             "in": "header",
             "name": "x-lmgw-reasoning-effort",
             "required": false,
@@ -4576,7 +4588,7 @@
             "x-lmgw-audience": "client"
           },
           {
-            "description": "integer thinking-token budget; 0 = off. Expressible on llama.cpp, Gemini and budget-style Anthropic models only. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
+            "description": "Integer thinking-token budget; 0 turns reasoning off. Expressible on llama.cpp, Gemini and budget-style Anthropic models only. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
             "in": "header",
             "name": "x-lmgw-reasoning-budget",
             "required": false,
@@ -4586,7 +4598,7 @@
             "x-lmgw-audience": "client"
           },
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -4638,13 +4650,13 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-count-approximate": {
-                "description": "RESPONSE: on the token counters, why the number is not exactly what the backend would count for this request, comma-separated: flattened (the request's structure was counted as plain text — chat template, tool-definition and per-message overhead are not included, so the real prompt is larger), tokenizer_guess (the backend's tokenizer is unknown; counted with tiktoken o200k_base), media_bound (images counted at the model's per-image upper bound), media_omitted (image or audio parts are not in the number), message_framing (/v1/count_tokens: the backend counts messages, so the text was counted as one user message, framing included). Absent when the count is exact.",
+                "description": "On the token counters, why the number is not exactly what the backend would count for this request; a comma-separated list. flattened: the request's structure was counted as plain text, so chat template, tool-definition and per-message overhead are not included and the real prompt is larger. tokenizer_guess: the backend's tokenizer is unknown, so the count uses tiktoken o200k_base. media_bound: images are counted at the model's per-image upper bound. media_omitted: image or audio parts are not in the number. message_framing: on /v1/count_tokens, the backend counts messages, so the text was counted as one user message, framing included. Absent when the count is exact.",
                 "schema": {
                   "enum": [
                     "flattened",
@@ -4657,13 +4669,13 @@
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -4715,11 +4727,11 @@
     },
     "/v1/models": {
       "get": {
-        "description": "Aggregates enabled aliases, public local models and expose-all upstream catalogs. Served OpenAI-shaped unless the caller sends anthropic-version, in which case the Anthropic SDK's own shape (model-capabilities design §2.2) — this document names the OpenAI error dialect as default; the Anthropic-dialect caller gets an Anthropic-shaped error body in practice.",
+        "description": "Aggregates enabled aliases, public local models and expose-all upstream catalogs. Served OpenAI-shaped unless the caller sends anthropic-version, in which case the Anthropic SDK's own shape. This document names the OpenAI error dialect as default; an Anthropic-dialect caller gets an Anthropic-shaped error body in practice.",
         "operationId": "get_v1_models",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -4791,7 +4803,7 @@
             "x-lmgw-wildcard": true
           },
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -4850,11 +4862,11 @@
     },
     "/v1/openapi.json": {
       "get": {
-        "description": "This description, filtered to the inference plane (§4.5).",
+        "description": "This description, filtered to the inference plane.",
         "operationId": "get_v1_openapi_json",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -4912,7 +4924,7 @@
     },
     "/v1/realtime": {
       "get": {
-        "description": "OpenAI's GA Realtime protocol over a WebSocket (ws://<host>/v1/realtime), answered by a cascade of this gateway's own aliases: voice activity and end-of-turn detection inside lmgw (Silero VAD; Smart Turn for semantic_vad), speech to text with realtime.asr_alias, the chat model, and text to speech with realtime.tts_alias — local models first, any of them a cloud alias if the owner chooses (Settings → Realtime, which also shows what the cascade holds on the GPU). `model` is resolved in this order: a realtime.model_map name, an OpenAI Realtime name (gpt-realtime*, never taken as an alias), which realtime.default_model answers, or a chat alias; it may be left out and named in the first session.update instead. What a name resolved to is echoed in session.lmgw.resolved. Implemented: conversation sessions (session.type realtime) with audio or text output, PCM16 at 24 kHz in and out, server_vad, semantic_vad and manual turns, barge-in with a word check, session.update, input_audio_buffer.append/commit/clear, conversation.item.create/retrieve/truncate/delete, response.create and response.cancel, client-side function tools, and MCP tools the gateway runs itself on a session not bound to a Chat thread. An MCP session tool {\"type\": \"mcp\", \"server_label\"} names one of this gateway's own MCP servers (by its tool prefix or name) or a built-in toolset (docs, kb, and lmgw for an owner credential while the self-admin tools are on), resolved as on /v1/responses under the key's tool scope; GET /v1/mcp/servers lists the labels a caller may use and GET /v1/mcp/servers/{label} one label's tools. server_url, connector_id, headers, authorization and server_description are accepted and never used: lmgw dials no URL a client names, and echoes authorization and header values as [redacted]. allowed_tools takes a name list or {tool_names}; read_only and a require_approval that would gate a tool are refused (approvals are not built here yet: leave it out or send \"never\"); one entry per server_label. The session lists a label's tools as an mcp_list_tools item (mcp_list_tools.in_progress, then .completed or .failed — a failed label also gets an error with code mcp_list_tools_failed saying why, and a later session.update naming it lists it again), and a response waits for the listings in flight. A model's call to one of those tools is an mcp_call item (server_label, name — the server's own tool name — arguments, output, error, always present), streamed as response.mcp_call_arguments.delta and .done, then run by the gateway before response.done (response.mcp_call.in_progress, then .completed with the output or .failed with a tool_execution_error). The call ends the response: the client sends response.create for the answer, as OpenAI's Realtime API has it (@openai/agents does so by itself, once per response). A cancel or barge-in abandons a running call, which then fails saying it may or may not have run. A response's tools may narrow to a label the session has listed, and tool_choice takes {\"type\": \"mcp\", \"server_label\"} with an optional name. A client may replay mcp_call items as history; mcp_list_tools and the approval items are refused. Each call writes a realtime-tool usage row. Refused with an error naming what is missing: transcription sessions, G.711 formats, output_audio_buffer.clear (WebRTC only) and an input_audio item without its transcript. Accepted and echoed but not applied: noise_reduction, and truncation (lmgw.resolved.truncation says \"disabled\"; an overflow is an error). Not served at all: WebRTC, SIP, ephemeral client secrets, live partial transcripts and out-of-band responses. Credentials as on every /v1 route; a browser, which cannot set headers on a WebSocket, may offer its key as the subprotocol `openai-insecure-api-key.<key>` alongside `realtime` — accepted on this route only. A beta client (OpenAI-Beta: realtime=v1) is refused with 400 beta_protocol_unsupported, and with Require API key off an anonymous upgrade from another page's Origin is refused with 403. Chat models list this route in their capabilities.endpoints on GET /v1/models once an ASR and a TTS alias are configured. The TTS gets lmgw's speech instructions — session.lmgw.speech_instructions, a response.create's response.lmgw.speech_instructions, else realtime.speech_instructions — as a style, or as the description a voice-design (vdes) model designs its voice from; session.lmgw.resolved.speech says what is in effect, and the transcript leaves out the inline tags ([laughter]) the voice renders. Markdown a voice cannot read is not spoken: fenced code blocks and tables (lines that start with |, from one that ends with | or is followed by a delimiter row) are skipped — the transcript leaves them out, and the model's history keeps them. On a style or passthrough TTS that renders no tags (Qwen3 CustomVoice, Auk, MOSS-TTS; a cloud TTS only when its alias's capabilities.speech override declares instructions 'style'), the tags that open a sentence, or a part of one spoken on its own, are a delivery cue instead ([laughing]): sent after the style as the instructions until that sentence ends, best effort, never read out (resolved.speech.cues). The dashboard's voice mode binds a session to a Chat thread with chat_thread=<id> (negative for a temporary chat): the admin capability only — the dashboard's cookie or an owner key; refused before the upgrade, as flat JSON and checked in this order, with 403 chat_thread_not_allowed, 400 owned_by_thread beside model, 404 chat_thread_not_found, and 409 chat_thread_admin for an Admin Chat thread (no voice mode there). session.created then names the thread in session.lmgw.resolved.chat_thread ({id, title, temporary, admin_tools}), and the connect warm loads the thread's chat, speech-to-text and text-to-speech models as one group, which may evict idle models as the requests it announces would, whatever realtime.warm_on_connect says (that setting is for unbound sessions). The thread then owns the chat model, prompt, tools, speech models, voice, speech style, language, seed and conversation: a session.update that changes one of them, a response.create that overrides one, and conversation.item.create or .delete are refused with owned_by_thread (an echoed value is accepted). Each response is the thread's own chat turn — its model, prompt with the spoken-style instructions after it, sampling, attachments, knowledge bases and MCP tools, which never become function_call items — written to the thread's history: the user turn with how it was spoken, the reply cut to what was heard (the unheard rest kept beside it, a reply nobody heard deleted unless it ran tools), never over a turn another window started meanwhile. Code blocks and tables are announced rather than skipped silently (\"Code block, rust.\", \"Table.\"; in the thread's language for en, de, fr, es and it), and the dashboard's read-aloud of a reply speaks the same way. No audio is stored: a spoken turn is kept as text. With chat_voice_audio_input on (Settings, or the thread's voice.audio_input), a turn whose answering model takes audio input — the thread's chat model, or the fallback a GPU hold, a benchmark run, an outside-VRAM verdict or a candidate alias hands it to, wherever it runs — goes to it as audio at the commit, while the speech-to-text model transcribes it beside (a model that does not take audio input, one whose capabilities lmgw cannot read, or one lmgw cannot send audio to, such as an Anthropic upstream, is refused it before anything is sent, and the turn goes again as its transcript); the reply is held until the transcript is in, then plays (a thread with no speech-to-text model that resolves always goes as its transcript: only the transcript tells words from noise). A turn that came back without words ends the response quietly as response.done {cancelled, reason no_words}, with no error and nothing written; a failed transcription of a turn the model heard (it answered from the audio) plays the reply and marks the user message (voice.transcript_error) instead of sending transcription.failed, while one no model heard yet, or a turn never transcribed at all (no speech-to-text model, the key's policy, the session's end), is said as with the setting off and ends the response quietly as response.done {cancelled, reason transcription_failed}. A new turn cuts a held reply whatever interrupt_response says, and a held reply's tools run only once its user message is written (a turn that came back without words runs none). A model's server that refuses the audio gets the transcript once, and the session's later turns to that model go as text when the refusal names the audio or the transcript retry answered (a server that went away under the audio is not retried, and its later turns go as text too). One session per thread: a second bind takes the thread over, and the older session gets error chat_thread_taken_over and the close 4000. A bound session — and no other — also sends lmgw's own events: lmgw.chat.frame ({response_id, event, data}: the chat turn's frames verbatim — turn, retrieval, delta, reasoning, tool, usage, stats, stop, state, error, done; reasoning is shown, stored with the reply and never spoken, and done's reasoning_note says in a sentence when the model reasoned although the turn asked for reasoning off — a voice turn does unless the thread sets reasoning; no off ends in an error — and its images_note when a fallback that cannot see answered and got the turn's images as placeholders), lmgw.chat.user ({message_id, content, voice, response_id}: response_id when that response heard the turn as audio, whose user message is written once the turn is transcribed, after the reply may have started — the page puts it before that reply), lmgw.chat.input ({response_id, input: audio or transcript, why}: how a response's turns reach the chat model and why the transcript, sent at each launch, when an audio attempt was refused, and when a llama-server that went away under the audio sends the session's later turns to it as text; never with chat_voice_audio_input off), lmgw.chat.reply ({message_id, content, unheard, voice}, {message_id, removed: true} or {message_id, skipped, voice}), lmgw.model.state ({stage, alias, state, ms, …}: the connect warm's and each turn's model loading), lmgw.chat.thread ({chat_thread: {id, title, temporary, admin_tools}}: the thread as a response re-read it, when that differs from session.lmgw.resolved.chat_thread — a title the first spoken turn named, the admin tools switched on or off) and lmgw.response.timing ({response_id, message_id, end_of_turn_ms, asr_ms, first_token_ms, reasoning_ms, first_clause_ms, first_audio_ms, total_ms, to_first_audio_ms, cold, models: {asr, chat, tts}, input, input_why, transcript_wait_ms}: the timing log line as data, each stage measured from the one before, reasoning_ms the part of first_token_ms the model reasoned (absent when it did not), cold naming the stages that loaded, input whether the chat model heard the turn as audio or read its transcript, input_why why the transcript, transcript_wait_ms how long the first output was held for the transcript (the three absent with chat_voice_audio_input off, transcript_wait_ms on the transcript path), each model with the alias that answered when a fallback did, first_clause: \"announcement\" when the first clause said was one; sent once the reply is written, message_id null when nothing was saved, and stored with the reply). A refusal mid-session is an error event; its codes: owned_by_thread (a client event changing what the thread owns), empty_turn (a response that would answer no turn), superseded and not_saved (another turn took the thread, or the reply could not be saved; its speech stops), chat_thread_not_found and chat_thread_admin, tts_not_configured, voice_not_configured, voice_not_found, instructions_required, voice_needs_transcript and speech_unavailable (the thread's speech, judged per response after response.created), chat_history_write_failed (the store refused the spoken turn; its words lead the next user message), and chat_thread_taken_over before the takeover's close.",
+        "description": "OpenAI's GA Realtime protocol over a WebSocket (ws://<host>/v1/realtime), answered by a cascade of this gateway's own aliases: voice activity and end-of-turn detection inside lmgw (Silero VAD; Smart Turn for semantic_vad), speech to text with realtime.asr_alias, the chat model, and text to speech with realtime.tts_alias — local models first, any of them a cloud alias if so configured (Settings → Realtime, which also shows what the cascade holds on the GPU). `model` is resolved in this order: a realtime.model_map name, an OpenAI Realtime name (gpt-realtime*, never taken as an alias), which realtime.default_model answers, or a chat alias; it may be left out and named in the first session.update instead. What a name resolved to is echoed in session.lmgw.resolved. Implemented: conversation sessions (session.type realtime) with audio or text output, PCM16 at 24 kHz in and out, server_vad, semantic_vad and manual turns, barge-in with a word check, session.update, input_audio_buffer.append/commit/clear, conversation.item.create/retrieve/truncate/delete, response.create and response.cancel, client-side function tools, and MCP tools the gateway runs itself on a session not bound to a Chat thread. An MCP session tool {\"type\": \"mcp\", \"server_label\"} names one of this gateway's own MCP servers (by its tool prefix or name) or a built-in toolset (docs, kb, and lmgw for an owner credential while the self-admin tools are on), resolved as on /v1/responses under the key's tool scope; GET /v1/mcp/servers lists the labels a caller may use and GET /v1/mcp/servers/{label} one label's tools. server_url, connector_id, headers, authorization and server_description are accepted and never used: lmgw dials no URL a client names, and echoes authorization and header values as [redacted]. allowed_tools takes a name list or {tool_names}; read_only and a require_approval that would gate a tool are refused (approvals are not built here yet: leave it out or send \"never\"); one entry per server_label. The session lists a label's tools as an mcp_list_tools item (mcp_list_tools.in_progress, then .completed or .failed — a failed label also gets an error with code mcp_list_tools_failed saying why, and a later session.update naming it lists it again), and a response waits for the listings in flight. A model's call to one of those tools is an mcp_call item (server_label, name — the server's own tool name — arguments, output, error, always present), streamed as response.mcp_call_arguments.delta and .done, then run by the gateway before response.done (response.mcp_call.in_progress, then .completed with the output or .failed with a tool_execution_error). The call ends the response: the client sends response.create for the answer, as OpenAI's Realtime API has it (@openai/agents does so by itself, once per response). A cancel or barge-in abandons a running call, which then fails saying it may or may not have run. A response's tools may narrow to a label the session has listed, and tool_choice takes {\"type\": \"mcp\", \"server_label\"} with an optional name. A client may replay mcp_call items as history; mcp_list_tools and the approval items are refused. Each call writes a realtime-tool usage row. Refused with an error naming what is missing: transcription sessions, G.711 formats, output_audio_buffer.clear (WebRTC only) and an input_audio item without its transcript. Accepted and echoed but not applied: noise_reduction, and truncation (lmgw.resolved.truncation says \"disabled\"; an overflow is an error). Not served at all: WebRTC, SIP, ephemeral client secrets, live partial transcripts and out-of-band responses. Credentials as on every /v1 route; a browser, which cannot set headers on a WebSocket, may offer its key as the subprotocol `openai-insecure-api-key.<key>` alongside `realtime` — accepted on this route only. A beta client (OpenAI-Beta: realtime=v1) is refused with 400 beta_protocol_unsupported, and with Require API key off an anonymous upgrade from another page's Origin is refused with 403. Chat models list this route in their capabilities.endpoints on GET /v1/models once an ASR and a TTS alias are configured. The TTS gets lmgw's speech instructions — session.lmgw.speech_instructions, a response.create's response.lmgw.speech_instructions, else realtime.speech_instructions — as a style, or as the description a voice-design (vdes) model designs its voice from; session.lmgw.resolved.speech says what is in effect, and the transcript leaves out the inline tags ([laughter]) the voice renders. Markdown a voice cannot read is not spoken: fenced code blocks and tables (lines that start with |, from one that ends with | or is followed by a delimiter row) are skipped — the transcript leaves them out, and the model's history keeps them. On a style or passthrough TTS that renders no tags (Qwen3 CustomVoice, Auk, MOSS-TTS; a cloud TTS only when its alias's capabilities.speech override declares instructions 'style'), the tags that open a sentence, or a part of one spoken on its own, are a delivery cue instead ([laughing]): sent after the style as the instructions until that sentence ends, best effort, never read out (resolved.speech.cues). The dashboard's voice mode binds a session to a Chat thread with chat_thread=<id> (negative for a temporary chat): the admin capability only — the dashboard's cookie or an owner key; refused before the upgrade, as flat JSON and checked in this order, with 403 chat_thread_not_allowed, 400 owned_by_thread beside model, 404 chat_thread_not_found, and 409 chat_thread_admin for an Admin Chat thread (no voice mode there). session.created then names the thread in session.lmgw.resolved.chat_thread ({id, title, temporary, admin_tools}), and the connect warm loads the thread's chat, speech-to-text and text-to-speech models as one group, which may evict idle models as the requests it announces would, whatever realtime.warm_on_connect says (that setting is for unbound sessions). The thread then owns the chat model, prompt, tools, speech models, voice, speech style, language, seed and conversation: a session.update that changes one of them, a response.create that overrides one, and conversation.item.create or .delete are refused with owned_by_thread (an echoed value is accepted). Each response is the thread's own chat turn — its model, prompt with the spoken-style instructions after it, sampling, attachments, knowledge bases and MCP tools, which never become function_call items — written to the thread's history: the user turn with how it was spoken, the reply cut to what was heard (the unheard rest kept beside it, a reply nobody heard deleted unless it ran tools), never over a turn another window started meanwhile. Code blocks and tables are announced rather than skipped silently (\"Code block, rust.\", \"Table.\"; in the thread's language for en, de, fr, es and it), and the dashboard's read-aloud of a reply speaks the same way. No audio is stored: a spoken turn is kept as text. With chat_voice_audio_input on (Settings, or the thread's voice.audio_input), a turn whose answering model takes audio input — the thread's chat model, or the fallback a GPU hold, a benchmark run, an outside-VRAM verdict or a candidate alias hands it to, wherever it runs — goes to it as audio at the commit, while the speech-to-text model transcribes it beside (a model that does not take audio input, one whose capabilities lmgw cannot read, or one lmgw cannot send audio to, such as an Anthropic upstream, is refused it before anything is sent, and the turn goes again as its transcript); the reply is held until the transcript is in, then plays (a thread with no speech-to-text model that resolves always goes as its transcript: only the transcript tells words from noise). A turn that came back without words ends the response quietly as response.done {cancelled, reason no_words}, with no error and nothing written; a failed transcription of a turn the model heard (it answered from the audio) plays the reply and marks the user message (voice.transcript_error) instead of sending transcription.failed, while one no model heard yet, or a turn never transcribed at all (no speech-to-text model, the key's policy, the session's end), is said as with the setting off and ends the response quietly as response.done {cancelled, reason transcription_failed}. A new turn cuts a held reply whatever interrupt_response says, and a held reply's tools run only once its user message is written (a turn that came back without words runs none). A model's server that refuses the audio gets the transcript once, and the session's later turns to that model go as text when the refusal names the audio or the transcript retry answered (a server that went away under the audio is not retried, and its later turns go as text too). One session per thread: a second bind takes the thread over, and the older session gets error chat_thread_taken_over and the close 4000. A bound session — and no other — also sends lmgw's own events: lmgw.chat.frame ({response_id, event, data}: the chat turn's frames verbatim — turn, retrieval, delta, reasoning, tool, usage, stats, stop, state, error, done; reasoning is shown, stored with the reply and never spoken, and done's reasoning_note says in a sentence when the model reasoned although the turn asked for reasoning off — a voice turn does unless the thread sets reasoning; no off ends in an error — and its images_note when a fallback that cannot see answered and got the turn's images as placeholders), lmgw.chat.user ({message_id, content, voice, response_id}: response_id when that response heard the turn as audio, whose user message is written once the turn is transcribed, after the reply may have started — the page puts it before that reply), lmgw.chat.input ({response_id, input: audio or transcript, why}: how a response's turns reach the chat model and why the transcript, sent at each launch, when an audio attempt was refused, and when a llama-server that went away under the audio sends the session's later turns to it as text; never with chat_voice_audio_input off), lmgw.chat.reply ({message_id, content, unheard, voice}, {message_id, removed: true} or {message_id, skipped, voice}), lmgw.model.state ({stage, alias, state, ms, …}: the connect warm's and each turn's model loading), lmgw.chat.thread ({chat_thread: {id, title, temporary, admin_tools}}: the thread as a response re-read it, when that differs from session.lmgw.resolved.chat_thread — a title the first spoken turn named, the admin tools switched on or off) and lmgw.response.timing ({response_id, message_id, end_of_turn_ms, asr_ms, first_token_ms, reasoning_ms, first_clause_ms, first_audio_ms, total_ms, to_first_audio_ms, cold, models: {asr, chat, tts}, input, input_why, transcript_wait_ms}: the timing log line as data, each stage measured from the one before, reasoning_ms the part of first_token_ms the model reasoned (absent when it did not), cold naming the stages that loaded, input whether the chat model heard the turn as audio or read its transcript, input_why why the transcript, transcript_wait_ms how long the first output was held for the transcript (the three absent with chat_voice_audio_input off, transcript_wait_ms on the transcript path), each model with the alias that answered when a fallback did, first_clause: \"announcement\" when the first clause said was one; sent once the reply is written, message_id null when nothing was saved, and stored with the reply). A refusal mid-session is an error event; its codes: owned_by_thread (a client event changing what the thread owns), empty_turn (a response that would answer no turn), superseded and not_saved (another turn took the thread, or the reply could not be saved; its speech stops), chat_thread_not_found and chat_thread_admin, tts_not_configured, voice_not_configured, voice_not_found, instructions_required, voice_needs_transcript and speech_unavailable (the thread's speech, judged per response after response.created), chat_history_write_failed (the store refused the spoken turn; its words lead the next user message), and chat_thread_taken_over before the takeover's close.",
         "operationId": "get_v1_realtime",
         "parameters": [
           {
@@ -4943,7 +4955,7 @@
             }
           },
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -5019,7 +5031,7 @@
         "operationId": "post_v1_rerank",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -5059,19 +5071,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -5123,11 +5135,11 @@
     },
     "/v1/responses": {
       "post": {
-        "description": "lmgw's own Responses API implementation (ingress/responses.rs) — llama-server has none. MCP tools run server-side on lmgw's registered MCP servers; background:true, truncation:\"auto\" and hosted tools are refused rather than approximated. An anthropic-beta header is forwarded when the route is an Anthropic upstream.",
+        "description": "lmgw's own Responses API implementation; llama-server has none. MCP tools run server-side on lmgw's registered MCP servers; background:true, truncation:\"auto\" and hosted tools are refused rather than approximated. An anthropic-beta header is forwarded when the route is an Anthropic upstream.",
         "operationId": "post_v1_responses",
         "parameters": [
           {
-            "description": "on|off — per-request thinking switch; wins over body fields. On a cloud model, off goes out in the form the model takes: no reasoning control where it has none, its lowest level where it cannot stop (x-lmgw-reasoning-ignored then says enabled). An off never ends in an error: a refused one is retried with what the refusal names and, failing that, with no reasoning control, so a model that cannot run without reasoning answers with its default reasoning. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
+            "description": "on|off: per-request thinking switch; it wins over body fields. On a cloud model, off goes out in the form the model takes: no reasoning control where the model has none, its lowest level where it cannot stop (x-lmgw-reasoning-ignored then lists enabled). An off never ends in an error: a refused one is retried with what the refusal names and, failing that, with no reasoning control, so a model that cannot run without reasoning answers with its default reasoning. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
             "in": "header",
             "name": "x-lmgw-reasoning",
             "required": false,
@@ -5141,7 +5153,7 @@
             "x-lmgw-audience": "client"
           },
           {
-            "description": "an effort level (see capabilities.reasoning.levels of the model); 'none' = off. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
+            "description": "An effort level (see capabilities.reasoning.levels of the model); 'none' turns reasoning off. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
             "in": "header",
             "name": "x-lmgw-reasoning-effort",
             "required": false,
@@ -5151,7 +5163,7 @@
             "x-lmgw-audience": "client"
           },
           {
-            "description": "integer thinking-token budget; 0 = off. Expressible on llama.cpp, Gemini and budget-style Anthropic models only. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
+            "description": "Integer thinking-token budget; 0 turns reasoning off. Expressible on llama.cpp, Gemini and budget-style Anthropic models only. Accepted on /v1/chat/completions, /v1/messages, /v1/messages/count_tokens and /v1/responses.",
             "in": "header",
             "name": "x-lmgw-reasoning-budget",
             "required": false,
@@ -5161,7 +5173,7 @@
             "x-lmgw-audience": "client"
           },
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -5202,19 +5214,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -5227,31 +5239,31 @@
                 }
               },
               "x-lmgw-images-omitted": {
-                "description": "RESPONSE: next to x-lmgw-fallback, how many of the request's images went to the fallback that answered as text placeholders, because its capabilities say it cannot see ('[image/png image, N base64 bytes — omitted: the answering model cannot see images]'); the model reads the placeholder, the client this count. On /v1/responses it counts the images the run opened with. Absent when every image was sent, and on a route the client named itself, which always gets its images.",
+                "description": "Sent next to x-lmgw-fallback: the number of the request's images that went to the answering fallback as text placeholders because its capabilities say it cannot see ('[image/png image, N base64 bytes — omitted: the answering model cannot see images]'). The model reads the placeholder; the client reads this count. On /v1/responses it counts the images the run opened with. Absent when every image was sent, and on a route the client named itself, which always gets its images.",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-max-tokens-clamped": {
-                "description": "RESPONSE: the max_tokens lmgw lowered the request's cap to, because a ladder rung or a guarded shared-KV-pool model's n_predict is the ceiling every request on it must respect. Absent when nothing was lowered — a missing max_tokens is filled, not clamped, and a value already under the ceiling is kept exactly.",
+                "description": "The max_tokens value lmgw lowered the request's cap to, because the n_predict of a ladder rung, or of a guarded shared-KV-pool model, is a ceiling every request on it must respect. Absent when nothing was lowered: a missing max_tokens is filled, not clamped, and a value already under the ceiling is kept exactly.",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-max-tokens-defaulted": {
-                "description": "RESPONSE: the max_tokens lmgw chose because the request set none and the route (an Anthropic upstream) requires one: the catalog's published maximum when streaming, 4096 when not streaming (the provider refuses non-streamed requests that could run too long).",
+                "description": "The max_tokens value lmgw chose because the request set none and the route (an Anthropic upstream) requires one: the catalog's published maximum when streaming, 4096 when not streaming (the provider refuses non-streamed requests that could run too long).",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-max-tokens-raised": {
-                "description": "RESPONSE: the max_tokens lmgw raised the request's cap to, because the requested thinking budget would not fit underneath it.",
+                "description": "The max_tokens value lmgw raised the request's cap to, because the requested thinking budget would not fit underneath it.",
                 "schema": {
                   "type": "integer"
                 }
               },
               "x-lmgw-reasoning-ignored": {
-                "description": "RESPONSE: comma-separated controls (enabled, effort, budget) the route could not express — enabled also when an off went out as no control or as the model's lowest level, because the model cannot take the off itself, or the provider refused every form of off and the model answered with its default reasoning; absent when everything was applied.",
+                "description": "Comma-separated list of the reasoning controls (enabled, effort, budget) the route could not express. enabled is also listed when an off went out as no control or as the model's lowest level, either because the model cannot take the off itself or because the provider refused every form of off and the model answered with its default reasoning. Absent when every control was applied.",
                 "schema": {
                   "enum": [
                     "enabled",
@@ -5262,7 +5274,7 @@
                 }
               },
               "x-lmgw-rung": {
-                "description": "RESPONSE: on a ladder model, the rung that answered (or refused) the request: '<k>/<n>; ctx=<per-slot context>; gguf=<weights file>', counted from 1 (the gguf part is left off when the file name cannot be a header value). A request whose prompt plus max output does not fit the running rung makes the model climb to the smallest rung that fits before it is answered; on /v1/responses it names the rung running when the run opened (a unary answer one of whose turns the fallback answered carries x-lmgw-fallback instead; a stream's headers leave before its turns run). Absent on models without a ladder and on responses a fallback answered.",
+                "description": "On a ladder model, the rung that answered (or refused) the request, as '<k>/<n>; ctx=<per-slot context>; gguf=<weights file>', counted from 1 (the gguf part is left off when the file name cannot be a header value). A request whose prompt plus max output does not fit the running rung makes the model climb to the smallest rung that fits before it answers. On /v1/responses it names the rung running when the run opened; a unary answer one of whose turns the fallback answered carries x-lmgw-fallback instead, and a stream's headers are sent before its turns run. Absent on models without a ladder and on responses a fallback answered.",
                 "schema": {
                   "type": "string"
                 }
@@ -5324,7 +5336,7 @@
             }
           },
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -5380,7 +5392,7 @@
         "x-lmgw-writes": true
       },
       "get": {
-        "description": "A stored response (crate::responses) — only present when the creating call ran with store: true and the gateway's own retention allows it.",
+        "description": "A stored response, exactly as it was served. It is present only when lmgw stored it — the creating call left store on (the default) while the gateway's response store was on, and it did not go to an upstream that implements the Responses API itself — and only until retention evicts its conversation as a whole: by default 168 hours after the conversation's last activity, or once it falls outside the 500 most recently active conversations. 404 otherwise.",
         "operationId": "get_v1_responses_id",
         "parameters": [
           {
@@ -5392,7 +5404,7 @@
             }
           },
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -5462,7 +5474,7 @@
             }
           },
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -5524,7 +5536,7 @@
         "operationId": "post_v1_tasks_run",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -5557,19 +5569,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",
@@ -5624,7 +5636,7 @@
         "operationId": "post_v1_tasks_stream",
         "parameters": [
           {
-            "description": "which live agent run to attribute this request's cost, tokens and call count to, by job id (container-runtime §3.1); only an agent token may attribute, and only to its own runs. An id naming no live run, a foreign run, or presented by a caller with no agent token is ignored with a log line, never a refusal.",
+            "description": "The job id of the live agent run to attribute this request's cost, tokens and call count to. Only an agent token may attribute, and only to its own runs. An id that names no live run, a run that belongs to another agent, or a caller without an agent token is ignored with a log line and never refused.",
             "in": "header",
             "name": "x-lmgw-run",
             "required": false,
@@ -5657,19 +5669,19 @@
             "description": "OK.",
             "headers": {
               "x-lmgw-candidate": {
-                "description": "RESPONSE: on a candidate alias, the id of the local model that answered (or refused) the request; never next to x-lmgw-fallback. The body's model field still names the alias requested.",
+                "description": "On a candidate alias, the id of the local model that answered (or refused) the request. Never sent next to x-lmgw-fallback. The body's model field still names the requested alias.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback": {
-                "description": "RESPONSE: the alias that actually answered instead of the requested local model; the body's model field still names the one requested. On the chat routes, a fallback whose capabilities say it cannot see got the request's images as text placeholders, and x-lmgw-images-omitted says how many.",
+                "description": "The alias that answered instead of the requested local model; the body's model field still names the requested one. On the chat routes, a fallback whose capabilities say it cannot see receives the request's images as text placeholders, and x-lmgw-images-omitted gives the count.",
                 "schema": {
                   "type": "string"
                 }
               },
               "x-lmgw-fallback-reason": {
-                "description": "RESPONSE: why x-lmgw-fallback answered, always next to it: hold (the owner's GPU hold pauses local models), benchmark (a benchmark run has the GPU to itself until it ends), external_vram (GPU memory used outside lmgw — another program — left too little room to load the model, so the fallback answered at once instead of waiting), background (a background job's model could not load without disturbing the owner's), unavailable (a candidate alias's primary cannot be used at all — missing, disabled or lacking a capability the alias enables — and none of its other models is loaded).",
+                "description": "Why x-lmgw-fallback answered; always sent next to it. hold: the GPU hold pauses local models. benchmark: a benchmark run has the GPU to itself until it ends. external_vram: GPU memory used outside lmgw by another program left too little room to load the model, so the fallback answered at once instead of waiting. background: a background job's model could not load without disturbing foreground work (any request that is not a background candidate alias's). unavailable: a candidate alias's primary cannot be used at all (missing, disabled, or lacking a capability the alias enables) and none of its other models is loaded.",
                 "schema": {
                   "enum": [
                     "hold",

@@ -13,7 +13,8 @@ just check      # build and check every link, external ones included
 just shots      # screenshots of every page, light, dark and phone width, into target/shots/
 ```
 
-`just shots` needs `just serve` running, Google Chrome and `python3-websockets`.
+`just shots` needs `just serve` running, Google Chrome and `python3-websockets`. `zola serve` keeps
+`load_data` results cached: after `just openapi` or `just releases`, restart `just serve`.
 
 ## Layout
 
