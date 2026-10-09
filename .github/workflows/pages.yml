@@ -1,8 +1,9 @@
 # Build the site with the pinned Zola (tools.env) and deploy it to GitHub Pages.
 # The repository's Pages source must be "GitHub Actions" (Settings → Pages).
 #
-# The release list is fetched fresh on every build, so a daily run picks up a new lmgw release
-# without a commit here. If the fetch fails, the committed data/releases.json is used.
+# The release lists of lmgw and Kai are fetched fresh on every build, so a daily run picks up a new
+# release without a commit here. If a fetch fails, the committed data/releases.json or
+# data/releases-kai.json is used.
 name: Pages
 
 on:
@@ -31,7 +32,7 @@ jobs:
       - name: Install Zola
         run: scripts/install-zola.sh
 
-      - name: Refresh the release list
+      - name: Refresh the release lists
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -41,7 +42,14 @@ jobs:
           else
             echo "::warning::could not fetch the lmgw releases; building with the committed list"
           fi
-          jq -r '.[] | .tag + "  " + .published' data/releases.json
+          # Kai's list may be empty (the page then links to GitHub), so only a failed fetch keeps the committed one.
+          if gh api repos/lmgw-dev/kai/releases --jq "$(cat scripts/releases.jq)" > data/releases-kai.json.new; then
+            mv data/releases-kai.json.new data/releases-kai.json
+          else
+            echo "::warning::could not fetch the Kai releases; building with the committed list"
+          fi
+          jq -r '.[] | "lmgw " + .tag + "  " + .published' data/releases.json
+          jq -r '.[] | "kai  " + .tag + "  " + .published' data/releases-kai.json
 
       - name: Build
         run: .tools/zola build

@@ -30,11 +30,14 @@ openapi:
     mv static/openapi-v1.json.new static/openapi-v1.json
     jq -r '"openapi-v1.json: lmgw " + .info.version + ", " + (.paths | length | tostring) + " paths"' static/openapi-v1.json
 
-# Refresh data/releases.json from GitHub (the Pages workflow does this on every build)
+# Refresh data/releases.json (lmgw) and data/releases-kai.json (Kai) from GitHub (the Pages workflow does this on every build)
 releases:
     gh api repos/lmgw-dev/lmgw/releases --jq "$(cat scripts/releases.jq)" > data/releases.json.new
     mv data/releases.json.new data/releases.json
-    jq -r '.[] | .tag + "  " + .published' data/releases.json
+    gh api repos/lmgw-dev/kai/releases --jq "$(cat scripts/releases.jq)" > data/releases-kai.json.new
+    mv data/releases-kai.json.new data/releases-kai.json
+    jq -r '.[] | "lmgw " + .tag + "  " + .published' data/releases.json
+    jq -r '.[] | "kai  " + .tag + "  " + .published' data/releases-kai.json
 
 # Screenshot every page, light and dark, desktop and phone, into target/shots/ (needs `just serve` running)
 shots:

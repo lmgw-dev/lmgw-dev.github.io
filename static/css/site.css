@@ -278,7 +278,7 @@ details.example pre { margin-top: 8px; }
 /* --- releases --- */
 .release { border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); padding: 22px 24px; margin: 0 0 22px; }
 .release-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 8px; }
-.release .release-head h2 { margin: 0; border: 0; padding: 0; font-size: 1.4rem; }
+.release .release-head h3 { margin: 0; border: 0; padding: 0; font-size: 1.4rem; }
 .release-head time { color: var(--text-3); font-size: .9rem; }
 .release .assets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .release .assets a { font-family: var(--mono); font-size: .82rem; border: 1px solid var(--border); border-radius: 6px; padding: 4px 9px; color: var(--text-2); }

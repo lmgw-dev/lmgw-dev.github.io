@@ -25,7 +25,7 @@ just shots      # screenshots of every page, light, dark and phone width, into t
 | `static/css/site.css` | All styles. The palette follows the lmgw dashboard's (`crates/lmgw-ui/assets/app.css`), dark first, light from the OS setting. |
 | `static/img/shots/` | Dashboard screenshots, from lmgw's `docs/screenshots/`. The build makes WebP copies for the page and links the PNGs. |
 | `static/openapi-v1.json` | lmgw's inference-plane OpenAPI document; `templates/api.html` renders the API reference from it. |
-| `data/releases.json` | The lmgw releases from GitHub, trimmed by `scripts/releases.jq`. |
+| `data/releases.json`, `data/releases-kai.json` | The lmgw and Kai releases from GitHub, trimmed by `scripts/releases.jq`. |
 | `tools.env` | The Zola version and its SHA-256, used by `just` and by the workflow alike. |
 
 ## Data from lmgw
@@ -34,9 +34,9 @@ just shots      # screenshots of every page, light, dark and phone width, into t
   check out its tag in the lmgw repository and run `just openapi` (it runs lmgw-core's `openapi`
   example, which prints what `GET /v1/openapi.json` serves; `LMGW_DIR` points at the checkout,
   default `../lmgw`). Commit the new `static/openapi-v1.json`.
-- **The release list** is fetched on every Pages build, which also runs daily, so a new release
-  shows up within a day without a commit. `just releases` refreshes the committed copy, which the
-  build falls back to.
+- **The release lists** of lmgw and Kai are fetched on every Pages build, which also runs daily,
+  so a new release shows up within a day without a commit. `just releases` refreshes the committed
+  copies, which the build falls back to.
 - **Screenshots** are copies of lmgw's `docs/screenshots/`; refresh them when those change.
 
 ## Deploying

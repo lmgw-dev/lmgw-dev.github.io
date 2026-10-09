@@ -16,6 +16,24 @@
 <span class="pill {{ kind }}">{{ label }}</span>
 {% endcomponent status %}
 
+{#- One project's releases, newest first, from a trimmed GitHub release list (scripts/releases.jq).
+    `prefix` keeps the anchors of two projects apart: lmgw's are the bare tags. -#}
+{% component release_list(releases: array, prefix: string = "") %}
+{%- for r in releases -%}
+<section class="release" id="{{ prefix }}{{ r.tag }}">
+<div class="release-head">
+<h3><a href="{{ r.url }}">{{ r.name or r.tag }}</a></h3>
+<time datetime="{{ r.published }}">{{ r.published | date(format="%Y-%m-%d") }}</time>
+{% if loop.first %}<span class="pill ok">Latest</span>{% endif %}
+{% if r.prerelease %}<span class="pill amber">Pre-release</span>{% endif %}
+</div>
+{{ r.body | markdown | safe }}
+{% set files = [a for a in r.assets if a.name is ending_with(pat=".rpm") or a.name is ending_with(pat=".AppImage")] %}
+{% if files %}<div class="assets">{% for a in files %}<a href="{{ a.url }}">{{ a.name }} · {{ a.size | filesizeformat }}</a>{% endfor %}</div>{% endif %}
+</section>
+{%- endfor -%}
+{% endcomponent release_list %}
+
 {#- How a request travels: clients, the gateway, the backends. -#}
 {% component flow() %}
 <div class="flow" role="img" aria-label="Clients talk to lmgw over /v1, /v1/messages and /mcp; lmgw sends each request to a local container, a cloud provider or an MCP server.">
