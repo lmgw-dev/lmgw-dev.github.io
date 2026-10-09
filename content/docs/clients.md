@@ -151,6 +151,13 @@ A key's tool scope decides which of them a client sees. The same tools can be na
 itself, which is every local model and every upstream not set to take `/v1/responses` directly.
 lmgw resolves the label against its own servers and never connects to a URL a client sends.
 
+`/mcp` also passes the servers' resources through, with their URIs namespaced by tool prefix, so
+an MCP Apps host can read a tool's view with `resources/read`. `tools/list` stamps every tool of a
+registered server with `_meta["lmgw/server"]` (its label, its name and the tool's own name), and
+app-only tools stay out of model runs. When two servers offer a tool of the same name, both move to
+`<server>__<tool>`. When a result has both text and `structuredContent`, the model reads the text,
+and clients and views get the structured part.
+
 ## Embeddings, rerank and tokens
 
 - `POST /v1/embeddings` takes OpenAI's request shape. Local embedding models appear with the
@@ -160,10 +167,97 @@ lmgw resolves the label against its own servers and never connects to a URL a cl
   backend's own tokenizer where it has one. `POST /v1/messages/count_tokens` and `POST /tokenize`
   are there for clients that expect Anthropic's or llama.cpp's routes.
 
-## Apps that need more than inference
+## Apps: device keys, the Chat and its feed
 
 A desktop or phone client like [Kai](@/kai.md) needs more than model calls: Chat threads it shares
-with the dashboard, a feed of changes, a key per device and a way to offer its own tools. lmgw
-plans these as general features of its API, described in its
-[client apps design record](https://github.com/lmgw-dev/lmgw/blob/main/docs/design/2026-10-06-client-apps-design.md).
-Until they land, the routes in the [API reference](@/docs/api.md) are the stable surface.
+with the dashboard, a feed of changes, a key of its own and a way to offer its own tools. lmgw has
+these as general features of its API, open to any client.
+
+- **Pairing.** **Usage → Keys & budgets → Pair a device…** mints a device key and shows it once,
+  inside an `lmgw-pair:?v=1&url=…&name=…&key=…` link that a client can register a URL scheme
+  handler for. A device key works on `/v1` like a client key, with its own scopes and budget, and
+  on the Chat API under `/chat/api/`. It never reaches the admin side.
+- **The feed.** `GET /chat/api/feed` is one Server-Sent Events stream per client. Stored events
+  (`thread.*`, `folder.*`, `profile.*`, `approval.*`, `task.*`, `device.revoked`) carry an SSE
+  `id:`, the cursor to resume from with `?since=<cursor>` or `Last-Event-ID`. Live events
+  (`turn.*`, `voice.*`, `hold`, `state`, `resync`, `revoked`) carry none, and `hello` says what is
+  live when the stream opens.
+- **Ongoing conversations.** A folder can be marked as one conversation that continues.
+  `POST /chat/api/folders/{id}/current` answers its current thread, starting a new one after the
+  folder's idle time, or at once with `{"new": true}`.
+- **Voice in a thread.** `GET /v1/realtime?chat_thread=<id>` binds a realtime session to a Chat
+  thread: its turns are stored there, and its tools are the thread's.
+- **Personality profiles.** `GET /chat/api/profiles` lists them with `default_profile_id`, the
+  profile new threads start with. A thread's `profile_id` (`null` for none) is set through
+  `POST /chat/api/threads/{id}/settings`, and a folder's defaults take one too. A folder whose
+  default is `null` inherits the Chat's default, it does not mean "none".
+
+[`lmgw-client`](https://github.com/lmgw-dev/lmgw/tree/main/crates/lmgw-client) is the Rust crate
+Kai and the dashboard's voice panel use for these: sans-IO, with the feed decoder, the realtime
+voice state and the wire types. The
+[client apps design record](https://github.com/lmgw-dev/lmgw/blob/main/docs/design/2026-10-06-client-apps-design.md)
+has the details.
+
+## Approvals for MCP tools
+
+An entry of a thread's `mcp_tools` takes `require_approval` in OpenAI's shapes: `"never"` (the
+default), `"always"`, or `{"always": {"tool_names": [...]}, "never": {"tool_names": [...]}}`. A
+folder's defaults take it too. A turn that reaches a gated call stops there: it streams a `tool`
+frame with `"event": "approval"` for each waiting call and ends with `pending_approvals`, and the
+waiting reply in `GET /chat/api/threads/{id}` lists the same calls as `pending_approvals`.
+
+Any Chat client decides them, with a verdict for every waiting call:
+
+```http
+POST /chat/api/threads/42/approvals
+content-type: application/json
+
+{"decisions": [
+  {"approval_request_id": "mcpr_1", "approve": true},
+  {"approval_request_id": "mcpr_2", "approve": false, "reason": "not now"}
+]}
+```
+
+The answer streams the resumed reply, which runs as the key that started the turn. The first
+decision wins (`409 approval_decided` for a later one), and a new message in the thread declines
+whatever still waits. The feed records `approval.requested` and `approval.decided`, each with the
+call's `call_id`, the same id the turn's `ready` and `result` frames carry. A realtime session bound
+to the thread gets OpenAI's `mcp_approval_request` item, answers with `mcp_approval_response` and
+`response.create`, and hears `lmgw.approval.decided` when another client decided first.
+
+A device can only tighten the rules: a settings write that would gate fewer calls is
+`403 approval_loosen_refused`. It approves only calls within its own reach
+(`403 approval_out_of_scope`), though it may decline any.
+
+## Late tool results
+
+An MCP server can answer a tool call with a task (MCP Tasks). The turn then goes on without the
+result, and the result enters the thread when it arrives, never while a turn runs. The next turn
+sees it as a call of `lmgw__job_result` and its result, in the order things happened.
+
+- `GET /chat/api/threads/{id}/tasks` lists the thread's tasks that still run or whose results wait
+  to enter, each with `id`, `tool`, `status` and `waiting_for`.
+- `POST /chat/api/threads/{id}/tasks/{task}/cancel` cancels one, `{task}` being its `id`.
+- `POST /chat/api/threads/{id}/answer` asks the model to answer results that arrived while nobody
+  was talking. With none waiting it is `409 nothing_to_answer`, and while a turn runs
+  `409 turn_running`.
+- The feed says `task.started` when a call becomes a task and `task.done` when its result entered
+  the thread. A realtime session bound to the thread gets `lmgw.task.done`, and a
+  `response.create` with no new words has the model answer it aloud.
+- `device.revoked` on the feed names a paired device whose key was deleted, so a client that runs
+  work that device started can cancel it.
+
+## Tools hosted by a device
+
+A device paired with a label under **hosts tools as** can serve MCP tools of its own. It opens a
+WebSocket to `GET /mcp/host` with its device key, and the roles reverse: lmgw is the MCP client on
+the link, the device the server, one JSON-RPC message per text frame. lmgw's `initialize` carries
+the link's limits in `params._meta["lmgw/host_limits"]`, and each forwarded `tools/call` names who
+it runs for in `_meta["lmgw/caller"]` and the approval that let it through in
+`_meta["lmgw/approval"]`. The tools appear as `<label>__<tool>` to the owner and lmgw's own Chat,
+and to keys and agents whose tool scope names the label.
+
+A key without the grant is refused `403 host_not_granted` before the upgrade, and a request with an
+`Origin` header `403 cross_origin_refused`. A newer link of the same device takes over (close
+4000), a revoked key closes the link with 4003, and a device that declares the tasks capability can
+run its tools as MCP tasks, as above.
