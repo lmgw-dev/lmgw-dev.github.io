@@ -3,6 +3,7 @@
 {% block content %}
 {% set releases = load_data(path="data/releases.json") %}
 {% set latest = releases[0] %}
+{% set kai_releases = load_data(path="data/releases-kai.json") %}
 <section class="hero">
   <div class="wrap">
     <h1 class="visually-hidden">lmgw, the local model gateway</h1>
@@ -40,7 +41,8 @@
       <div class="point"><h3>Voice</h3><p><code>/v1/realtime</code> speaks OpenAI's Realtime protocol and answers with your
         own speech-to-text, chat and text-to-speech models. The Chat has dictation, read-aloud and a voice mode.</p></div>
       <div class="point"><h3>Tools in one place</h3><p>Your MCP servers behind one <code>/mcp</code> endpoint, plus built-in
-        tools that search library documentation and your own knowledge bases.</p></div>
+        tools that search library documentation and your own knowledge bases. Calls can wait for your approval, and
+        long-running ones report back when they are done.</p></div>
       <div class="point"><h3>A desktop app</h3><p>It lives in the tray and opens its own window, which takes the frame, fonts
         and colours of KDE Plasma. Bound to your network, the same dashboard works in a browser.</p></div>
     </div>
@@ -51,7 +53,7 @@
   <div class="wrap">
     <h2>lmgw and its clients</h2>
     <p class="lead">The gateway holds the models. Apps around it are clients of its API, separate programs to install
-      or leave out. The first, Kai, is in development.</p>
+      or leave out. The first, Kai, brings voice and desktop tools to KDE Plasma.</p>
     <div class="cards">
       <a class="card" href="{{ get_url(path='@/lmgw.md') }}">
         <div class="card-head"><h3>lmgw</h3><span class="pill ok">Released · {{ latest.tag }}</span></div>
@@ -60,9 +62,9 @@
         <span class="more">About the gateway →</span>
       </a>
       <a class="card" href="{{ get_url(path='@/kai.md') }}">
-        <div class="card-head"><h3>Kai</h3><span class="pill amber">In development</span></div>
-        <p>A voice client planned for the Plasma desktop: talk to your models from a global shortcut, see what it is doing
-          in the tray, and keep one ongoing conversation. Every model call goes through lmgw.</p>
+        <div class="card-head"><h3>Kai</h3><span class="pill ok">Released{% if kai_releases %} · {{ kai_releases[0].tag }}{% endif %}</span></div>
+        <p>A voice client for the Plasma desktop: talk to your models from a global shortcut, keep one ongoing
+          conversation, and let them use the desktop through tools you control. Every model call goes through lmgw.</p>
         <span class="more">About Kai →</span>
       </a>
       <a class="card dashed" href="{{ get_url(path='@/docs/clients.md') }}">
@@ -80,7 +82,8 @@
     <div>
       <h2>Built on an open API</h2>
       <p class="lead">Clients of lmgw get no private channel. The OpenAI and Anthropic dialects, the Realtime WebSocket and
-        MCP are open to any program today, and what Kai needs beyond them is being added as documented API.</p>
+        MCP are open to any program, and what Kai needed beyond them went in as documented API: device keys, a Chat
+        feed, approvals, late tool results and tools hosted by the device.</p>
       <p class="muted">The API reference on this site is generated from the gateway's own OpenAPI document, the one a
         running lmgw serves at <code>/v1/openapi.json</code>.</p>
       <div class="actions" style="justify-content:flex-start">

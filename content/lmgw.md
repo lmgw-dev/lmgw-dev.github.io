@@ -66,7 +66,13 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
   answers with a cascade of your own models: turn detection inside lmgw, speech to text, a chat
   model with tools, and text to speech.
 - **MCP gateway.** Stdio servers (isolated in Podman by default) and HTTP servers sit behind one
-  `/mcp` endpoint, each under its own tool prefix.
+  `/mcp` endpoint, each under its own tool prefix, with their resources and MCP Apps views passed
+  through.
+- **Approvals for MCP tools.** A thread or folder can make tools wait for an approval. The turn
+  stops at the call, and you approve or decline it on the call's card in the Chat, or from a paired
+  device.
+- **Late tool results.** A tool that its MCP server runs as a task (MCP Tasks) no longer holds the
+  turn: its result enters the thread when it arrives, and a voice session speaks it.
 
 **Docs and knowledge**
 
@@ -86,6 +92,11 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
   Speech models switched to the CPU keep serving.
 - **Chat, with voice.** Chat with any alias, with attachments, knowledge bases and MCP tools.
   Dictate, have replies read aloud, or talk in voice mode, all on your own speech models.
+- **Personality profiles.** A profile bundles a system prompt, reasoning settings and a voice.
+  Give one to a thread or a folder, and try a draft out loud before you save it.
+- **Paired client apps.** A desktop or phone app pairs through a link and gets a device key of its
+  own. It shares the Chat with the dashboard, follows a feed of changes, and can host MCP tools of
+  its own that the Chat, agents and other clients use.
 - **A native window, a browser too.** The dashboard is written in Rust (Leptos, compiled to
   WebAssembly). On KDE Plasma the window takes the desktop's frame, fonts and colours. Bind lmgw to
   your network and the same dashboard works in a browser.
