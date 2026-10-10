@@ -3,6 +3,7 @@ title = "lmgw"
 description = "A Linux desktop app that runs models on your own GPU and serves them through local copies of the OpenAI and Anthropic APIs, with cloud providers behind the same aliases."
 [extra]
 kicker = "The gateway"
+lockup = "lmgw"
 status = "Released"
 status_kind = "ok"
 +++

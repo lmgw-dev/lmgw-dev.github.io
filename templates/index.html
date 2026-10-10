@@ -56,13 +56,13 @@
       or leave out. The first, Kai, brings voice and desktop tools to KDE Plasma.</p>
     <div class="cards">
       <a class="card" href="{{ get_url(path='@/lmgw.md') }}">
-        <div class="card-head"><h3>lmgw</h3><span class="pill ok">Released · {{ latest.tag }}</span></div>
+        <div class="card-head"><span class="card-title"><img src="{{ get_url(path='img/lmgw-icon.svg') }}" width="40" height="40" alt=""><h3>lmgw</h3></span><span class="pill ok">Released · {{ latest.tag }}</span></div>
         <p>The gateway. Runs local models, routes to cloud providers, and serves everything through OpenAI- and
           Anthropic-compatible APIs, Realtime voice and MCP.</p>
         <span class="more">About the gateway →</span>
       </a>
       <a class="card" href="{{ get_url(path='@/kai.md') }}">
-        <div class="card-head"><h3>Kai</h3><span class="pill ok">Released{% if kai_releases %} · {{ kai_releases[0].tag }}{% endif %}</span></div>
+        <div class="card-head"><span class="card-title"><img src="{{ get_url(path='img/kai-icon.svg') }}" width="40" height="40" alt=""><h3>Kai</h3></span><span class="pill ok">Released{% if kai_releases %} · {{ kai_releases[0].tag }}{% endif %}</span></div>
         <p>A voice client for the Plasma desktop: talk to your models from a global shortcut, keep one ongoing
           conversation, and let them use the desktop through tools you control. Every model call goes through lmgw.</p>
         <span class="more">About Kai →</span>

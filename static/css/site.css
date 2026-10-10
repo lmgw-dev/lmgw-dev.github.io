@@ -178,6 +178,9 @@ th { color: var(--text-2); font-weight: 500; font-size: .85rem; }
 }
 a.card:hover { text-decoration: none; border-color: var(--border-strong); background: var(--surface-hi); color: var(--text); }
 .card .card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.card .card-head { min-height: 40px; }
+.card .card-title { display: flex; align-items: center; gap: 12px; }
+.card .card-title img { flex: none; border-radius: 9px; }
 .card h3 { margin: 0; font-size: 1.2rem; }
 .card p { margin: 0; color: var(--text-2); }
 .card .more { margin-top: auto; color: var(--accent); font-weight: 500; font-size: .95rem; }
@@ -301,3 +304,5 @@ details.example pre { margin-top: 8px; }
   .site-nav { margin-left: 0; width: 100%; }
   .nav-gh span { display: none; }
 }
+
+.page-head .lockup { display: block; height: 112px; width: auto; max-width: 70vw; margin-bottom: 18px; }

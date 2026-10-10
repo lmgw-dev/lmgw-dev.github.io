@@ -2,6 +2,17 @@
 {% block content %}
 <div class="wrap narrow">
   <header class="page-head">
+    {% if page.extra.lockup %}{% if page.extra.lockup == "kai" %}
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="{{ get_url(path='img/kai-logo-light.svg') }}">
+      <img class="lockup" src="{{ get_url(path='img/kai-logo-dark.svg') }}" width="381" height="160" alt="Kai, voice assistant">
+    </picture>
+    {% else %}
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="{{ get_url(path='img/logo-light.svg') }}">
+      <img class="lockup" src="{{ get_url(path='img/logo-dark.svg') }}" width="429" height="160" alt="lmgw, local model gateway">
+    </picture>
+    {% endif %}{% endif %}
     {% if page.extra.kicker %}<div class="kicker">{{ page.extra.kicker }}</div>{% endif %}
     <h1>{{ page.title }}{% if page.extra.status %} {{ <status label={page.extra.status} kind={page.extra.status_kind or "amber"} /> }}{% endif %}</h1>
     {% if page.description %}<p class="lead">{{ page.description }}</p>{% endif %}

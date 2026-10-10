@@ -3,6 +3,7 @@ title = "Kai"
 description = "A voice client for the KDE Plasma desktop: talk to your models from a global shortcut, keep one ongoing conversation, and let them use the desktop through tools you control. Every model call goes through lmgw."
 [extra]
 kicker = "A Plasma client of lmgw"
+lockup = "kai"
 status = "Released"
 status_kind = "ok"
 +++
