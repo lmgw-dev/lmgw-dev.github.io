@@ -23,11 +23,14 @@ build: tools
 check: tools
     {{zola}} check
 
-# Regenerate static/openapi-v1.json from the lmgw checkout (LMGW_DIR, default ../lmgw); check out a release tag there first
+# Regenerate static/openapi.json (the complete document) and static/openapi-v1.json (the developer document) from the lmgw checkout (LMGW_DIR, default ../lmgw); check out a release tag there first
 openapi:
     git -C {{lmgw_dir}} describe --tags --always
+    cargo run -q -j 8 --manifest-path {{lmgw_dir}}/Cargo.toml -p lmgw-core --example openapi -- admin > static/openapi.json.new
+    mv static/openapi.json.new static/openapi.json
     cargo run -q -j 8 --manifest-path {{lmgw_dir}}/Cargo.toml -p lmgw-core --example openapi > static/openapi-v1.json.new
     mv static/openapi-v1.json.new static/openapi-v1.json
+    jq -r '"openapi.json: lmgw " + .info.version + ", " + (.paths | length | tostring) + " paths"' static/openapi.json
     jq -r '"openapi-v1.json: lmgw " + .info.version + ", " + (.paths | length | tostring) + " paths"' static/openapi-v1.json
 
 # Refresh data/releases.json (lmgw) and data/releases-kai.json (Kai) from GitHub (the Pages workflow does this on every build)

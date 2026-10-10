@@ -61,7 +61,7 @@
 {%- elif s.oneOf or s.anyOf -%}
 {%- for v in (s.oneOf or s.anyOf) -%}{{ <api.type s={v} /> }}{% if not loop.last %} | {% endif %}{%- endfor -%}
 {%- elif s.type == "array" -%}
-array{% if s.items %} of {{ <api.type s={s.items} /> }}{% endif %}
+array{% if s.items and s.items is iterable %} of {{ <api.type s={s.items} /> }}{% endif %}
 {%- elif s.type is array -%}
 {{ s.type | join(sep=" | ") }}
 {%- elif s.type -%}
@@ -76,6 +76,7 @@ any
 {#- One table row per property, children indented below their parent. -#}
 {% component api.props(props: map, required: array = [], depth: integer = 0) %}
 {%- for name, p in props -%}
+{%- if p is iterable -%}
 <tr><td class="name" style="padding-left: {{ 10 + depth * 18 }}px"><code>{{ name }}</code>{% if name in required %}<span class="req" title="required">required</span>{% endif %}</td>
 <td><span class="type">{{ <api.type s={p} /> }}</span>{% if p.description %} {{ <api.text t={p.description} /> }}{% endif %}{% if p.enum %} <span class="enum">One of {% for e in p.enum %}<code>{{ e }}</code>{% if not loop.last %}, {% endif %}{% endfor %}.</span>{% endif %}{% if p.default is defined %} <span class="enum">Default <code>{{ p.default | json_encode }}</code>.</span>{% endif %}</td></tr>
 {%- if p.properties -%}
@@ -83,5 +84,32 @@ any
 {%- elif p.items and p.items.properties -%}
 {{ <api.props props={p.items.properties} required={p.items.required or []} depth={depth + 1} /> }}
 {%- endif -%}
+{%- else -%}
+<tr><td class="name" style="padding-left: {{ 10 + depth * 18 }}px"><code>{{ name }}</code>{% if name in required %}<span class="req" title="required">required</span>{% endif %}</td><td><span class="type">any</span></td></tr>
+{%- endif -%}
 {%- endfor -%}
 {% endcomponent api.props %}
+
+{#- A response (or event) schema as the request body gets it: a $ref links and opens into its fields, an inline object
+    shows its fields, an array names its item and shows that too, anyOf/oneOf lists every arm (collapsed). -#}
+{% component api.body(s: map, comps: map, expand: bool = true) %}
+{%- if s["$ref"] -%}
+{%- set name = s["$ref"] | split(pat="/") | last -%}
+{%- set ref = comps[name] -%}
+<span class="type">{{ <api.type s={s} /> }}</span>
+{%- if not expand %}{%- elif ref and ref is iterable and ref.properties %} <details class="example"><summary>Fields of {{ name }}</summary><table><tbody>{{ <api.props props={ref.properties} required={ref.required or []} /> }}</tbody></table></details>
+{%- elif ref and ref is iterable and (ref.oneOf or ref.anyOf) %} <details class="example"><summary>{{ name }}: {{ (ref.oneOf or ref.anyOf) | length }} shapes</summary>{% for v in (ref.oneOf or ref.anyOf) %}<div class="arm">{{ <api.body s={v} comps={comps} expand={expand} /> }}</div>{% endfor %}</details>
+{%- endif -%}
+{%- elif s.properties -%}
+<span class="type">{% if s.title %}{{ s.title }}{% else %}object{% endif %}</span>
+<details class="example"><summary>Fields{% if s.title %} of {{ s.title }}{% endif %}</summary><table><tbody>{{ <api.props props={s.properties} required={s.required or []} /> }}</tbody></table></details>
+{%- elif s.oneOf or s.anyOf -%}
+<details class="example"><summary>One of {{ (s.oneOf or s.anyOf) | length }} shapes</summary>
+{%- for v in (s.oneOf or s.anyOf) -%}<div class="arm">{{ <api.body s={v} comps={comps} expand={expand} /> }}{% if v.description and not v["$ref"] %} <span class="muted">{{ <api.text t={v.description} /> }}</span>{% endif %}{% if v["$ref"] and v.description %} <span class="muted">{{ <api.text t={v.description} /> }}</span>{% endif %}</div>{%- endfor -%}
+</details>
+{%- elif s.type == "array" and s.items and s.items is iterable -%}
+<span class="type">array of</span> {{ <api.body s={s.items} comps={comps} expand={expand} /> }}
+{%- else -%}
+<span class="type">{{ <api.type s={s} /> }}</span>
+{%- endif -%}
+{% endcomponent api.body %}

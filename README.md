@@ -24,7 +24,8 @@ just shots      # screenshots of every page, light, dark and phone width, into t
 | `templates/` | `base.html` (header, footer), one template per page kind, `components.html` (the components, and the API reference's schema rendering). |
 | `static/css/site.css` | All styles. The palette follows the lmgw dashboard's (`crates/lmgw-ui/assets/app.css`), dark first, light from the OS setting. |
 | `static/img/shots/` | Dashboard screenshots, from lmgw's `docs/screenshots/`. The build makes WebP copies for the page and links the PNGs. |
-| `static/openapi-v1.json` | lmgw's inference-plane OpenAPI document; `templates/api.html` renders the API reference from it. |
+| `static/openapi.json` | lmgw's complete OpenAPI document (`/api/openapi.json`); `templates/api.html` renders the API reference from it. |
+| `static/openapi-v1.json` | The developer document (`/v1/openapi.json`), offered as a second download on the API page only. |
 | `data/releases.json`, `data/releases-kai.json` | The lmgw and Kai releases from GitHub, trimmed by `scripts/releases.jq`. |
 | `tools.env` | The Zola version and its SHA-256, used by `just` and by the workflow alike. |
 
@@ -32,8 +33,9 @@ just shots      # screenshots of every page, light, dark and phone width, into t
 
 - **The API reference** comes from the gateway's own OpenAPI document. After an lmgw release,
   check out its tag in the lmgw repository and run `just openapi` (it runs lmgw-core's `openapi`
-  example, which prints what `GET /v1/openapi.json` serves; `LMGW_DIR` points at the checkout,
-  default `../lmgw`). Commit the new `static/openapi-v1.json`.
+  example, which prints what `GET /api/openapi.json` serves, and without `admin` the developer
+  document of `GET /v1/openapi.json`; `LMGW_DIR` points at the checkout, default `../lmgw`).
+  Commit the new `static/openapi.json` and `static/openapi-v1.json`.
 - **The release lists** of lmgw and Kai are fetched on every Pages build, which also runs daily,
   so a new release shows up within a day without a commit. `just releases` refreshes the committed
   copies, which the build falls back to.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Screenshot a page of the local preview in headless Chrome, light or dark, as a full page.
 
-Usage: scripts/shot.py <url> <out.png> [--dark] [--width 1440] [--mobile]
+Usage: scripts/shot.py <url> <out.png> [--dark] [--width 1440] [--mobile] [--at ID] [--clip-height PX]
        (`just shots` takes every page at desktop and phone width, both schemes, into target/shots/)
 
 Needs google-chrome and python3-websockets. The Chrome profile is a temporary directory removed
@@ -74,10 +74,25 @@ async def shoot(args: argparse.Namespace) -> None:
                 window.scrollTo(0, 0);
                 await Promise.all([...document.images].map(i => i.complete ? 0 : i.decode().catch(() => 0)));
             })()""")
+            if args.open_details:
+                await call("Runtime.evaluate", expression="document.querySelectorAll('details').forEach(d => d.open = true)")
             metrics = await call("Page.getLayoutMetrics")
             height = int(metrics["cssContentSize"]["height"])
+            top = 0
+            if args.at:
+                # A long page (the API reference is ~100k px): capture a slice from an element's top.
+                found = await call("Runtime.evaluate", returnByValue=True, expression=
+                    f"(() => {{ const e = document.getElementById({json.dumps(args.at)}); "
+                    "return e ? Math.round(e.getBoundingClientRect().top + window.scrollY) : -1; })()")
+                top = found["result"]["value"]
+                if top < 0:
+                    raise SystemExit(f"no element with id {args.at}")
+            if args.clip_height:
+                height = min(args.clip_height, height - top)
+            else:
+                height -= top
             shot = await call("Page.captureScreenshot", format="png", captureBeyondViewport=True,
-                              clip={"x": 0, "y": 0, "width": width, "height": height, "scale": 1})
+                              clip={"x": 0, "y": top, "width": width, "height": height, "scale": 1})
             with open(args.out, "wb") as f:
                 f.write(base64.b64decode(shot["data"]))
             print(f"wrote {args.out} ({width}x{height})")
@@ -99,6 +114,9 @@ def main() -> None:
     p.add_argument("out")
     p.add_argument("--dark", action="store_true")
     p.add_argument("--width", type=int, default=1440)
+    p.add_argument("--at", metavar="ID", help="start at the element with this id instead of the page top")
+    p.add_argument("--clip-height", type=int, metavar="PX", help="capture only this many px (a slice of a long page)")
+    p.add_argument("--open-details", action="store_true", help="expand every <details> first")
     p.add_argument("--mobile", action="store_true", help="390 px wide, as a phone")
     asyncio.run(asyncio.wait_for(shoot(p.parse_args()), timeout=90))
 

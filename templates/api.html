@@ -1,16 +1,23 @@
 {% extends "base.html" %}
-{#- The API reference, rendered from the OpenAPI document a running lmgw serves at /v1/openapi.json
-    (static/openapi-v1.json; `just openapi` refreshes it from the lmgw sources). -#}
+{#- The API reference, rendered from the complete OpenAPI document a running lmgw serves at /api/openapi.json
+    (static/openapi.json; `just openapi` refreshes it from the lmgw sources, and writes the developer
+    document of /v1/openapi.json beside it as static/openapi-v1.json, a download only). Tags carry
+    x-lmgw-group, which the navigation and the sections use as headings. -#}
 {% block content %}
-{% set doc = load_data(path="static/openapi-v1.json") %}
+{% set doc = load_data(path="static/openapi.json") %}
 {% set methods = ["get", "post", "put", "patch", "delete"] %}
+{% set principals = doc["x-lmgw-principals"] %}
 <div class="wrap">
   <header class="page-head">
     <div class="kicker">Reference</div>
     <h1>{{ page.title }}</h1>
     <p class="lead">{{ <api.text t={doc.info.description} /> }}</p>
     <p class="tagline-small">Generated from the OpenAPI document of lmgw {{ doc.info.version }}.
-      <a href="{{ get_url(path='openapi-v1.json') }}" download>Download openapi-v1.json</a></p>
+      The dashboard's own pages, the <code>/ui</code> redirects and the agents' app and MCP proxies are not part of it.</p>
+    <ul class="downloads">
+      <li><a href="{{ get_url(path='openapi.json') }}" download>openapi.json</a>: the complete document of this page, the dashboard API, Chat API, Knowledge, labs and ops included.</li>
+      <li><a href="{{ get_url(path='openapi-v1.json') }}" download>openapi-v1.json</a>: the developer document (<code>/v1/openapi.json</code>): the inference routes, the device Chat API and the agent run API. The one to feed a client generator.</li>
+    </ul>
   </header>
 
   <div class="api">
@@ -18,8 +25,10 @@
       <h4>Overview</h4>
       <a href="#using">Base URLs and keys</a>
       <a href="#headers">lmgw headers</a>
+      {% set_global navgroup = "" %}
       {% for tag in doc.tags %}
-      <h4>{{ tag["x-displayName"] or tag.name }}</h4>
+      {% if tag["x-lmgw-group"] and tag["x-lmgw-group"] != navgroup %}{% set_global navgroup = tag["x-lmgw-group"] %}<h4 class="group"><a href="#group-{{ navgroup | slugify }}">{{ navgroup }}</a></h4>{% endif %}
+      <h5>{{ tag["x-displayName"] or tag.name }}</h5>
       {% for path, ops in doc.paths %}{% for method, op in ops %}{% if method in methods and tag.name in op.tags %}
       <a href="#op-{{ op.operationId }}"><span class="verb {{ method }}">{{ method }}</span><code>{{ path | replace(from="/", to="/<wbr>") | safe }}</code></a>
       {% endif %}{% endfor %}{% endfor %}
@@ -58,12 +67,18 @@
         </tbody>
       </table>
 
+      {% set_global secgroup = "" %}
       {% for tag in doc.tags %}
-      <h2 id="tag-{{ tag.name }}">{{ tag["x-displayName"] or tag.name }}</h2>
+      {% if tag["x-lmgw-group"] and tag["x-lmgw-group"] != secgroup %}{% set_global secgroup = tag["x-lmgw-group"] %}<h2 class="group" id="group-{{ secgroup | slugify }}">{{ secgroup }}</h2>{% endif %}
+      <h3 class="tag" id="tag-{{ tag.name }}">{{ tag["x-displayName"] or tag.name }}</h3>
+      {% if tag.description and tag.description != tag["x-displayName"] and tag.description != tag.name %}<p class="muted">{{ <api.text t={tag.description} /> }}</p>{% endif %}
       {% for path, ops in doc.paths %}{% for method, op in ops %}{% if method in methods and tag.name in op.tags %}
       <section class="op" id="op-{{ op.operationId }}">
         <div class="op-head"><span class="verb {{ method }}">{{ method }}</span><code class="path">{{ path }}</code></div>
-        <h3>{{ op.summary }}</h3>
+        <h3>{{ op.summary }}{% if op.deprecated %} <span class="badge">deprecated</span>{% endif %}</h3>
+        {% set_global who = [] %}
+        {% for pr, caps in principals %}{% if op["x-lmgw-capability"] in caps and pr != "anonymous_auth_off" %}{% set_global who = [...who, pr] %}{% endif %}{% endfor %}
+        {% if op["x-lmgw-capability"] %}<p class="tagline-small">Capability <code>{{ op["x-lmgw-capability"] }}</code>{% if who %}, open to: {% for w in who %}<code>{{ w }}</code>{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}{% if op["x-lmgw-writes"] %}. Changes state.{% endif %}</p>{% endif %}
         {% if op.description %}<div class="desc"><p>{{ <api.text t={op.description} /> }}</p></div>{% endif %}
 
         {% set params = [p for p in op.parameters or [] if not (p.in == "header" and p.name is starting_with(pat="x-lmgw-"))] %}
@@ -106,7 +121,13 @@
           {% for code, r in op.responses %}
             <tr><td class="name"><code>{{ code }}</code></td>
               <td>{{ <api.text t={r.description or ""} /> }}
-                {% if r.content %}<br>{% for ctype, media in r.content %}<code>{{ ctype }}</code>{% if media.schema %}: <span class="type">{{ <api.type s={media.schema} /> }}</span>{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}{% endif %}
+                {% if r.content %}<br>{% for ctype, media in r.content %}<div class="media"><code>{{ ctype }}</code>{% if media.schema %} {{ <api.body s={media.schema} comps={doc.components.schemas} expand={code is starting_with(pat="2")} /> }}{% endif %}</div>{% endfor %}{% endif %}
+                {% if r["x-lmgw-sse-events"] %}<details class="example"><summary>{{ r["x-lmgw-sse-events"] | length }} event types</summary>
+                  {% for ev, es in r["x-lmgw-sse-events"] %}
+                  <p><code>{{ ev }}</code>{% if es.title %} <span class="type">{{ es.title }}</span>{% endif %}{% if es.description %}<br><span class="muted">{{ <api.text t={es.description} /> }}</span>{% endif %}</p>
+                  {% if es.properties %}<table><tbody>{{ <api.props props={es.properties} required={es.required or []} /> }}</tbody></table>
+                  {% elif es.oneOf or es.anyOf %}{{ <api.body s={es} comps={doc.components.schemas} /> }}{% endif %}
+                  {% endfor %}</details>{% endif %}
                 {% if r.headers %}<br><span class="muted">Headers:</span> {% for name, h in r.headers %}{% if name is starting_with(pat="x-lmgw-") %}<a href="#headers"><code>{{ name }}</code></a>{% else %}<code>{{ name }}</code>{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}
               </td></tr>
           {% endfor %}

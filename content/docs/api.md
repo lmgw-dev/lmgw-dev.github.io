@@ -1,6 +1,6 @@
 +++
 title = "API reference"
-description = "The HTTP API of lmgw's inference plane: the OpenAI-, Anthropic- and llama.cpp-compatible routes, lmgw's own extensions and MCP, generated from the gateway's OpenAPI document."
+description = "The complete HTTP API of lmgw: the OpenAI-, Anthropic- and llama.cpp-compatible routes, lmgw's own extensions and MCP, the device Chat API, the dashboard API with Knowledge, labs and ops, and the agent run API, generated from the gateway's OpenAPI document."
 template = "api.html"
 weight = 2
 +++
@@ -26,5 +26,8 @@ Errors come in the shape of the protocol you called: OpenAI's on the OpenAI rout
 `/v1/messages`. A local model paused by the GPU hold answers `503` with the code `gpu_hold`, unless
 it has a fallback, which then answers instead and is named in `x-lmgw-fallback`.
 
-This page covers what a client can reach with an inference key. The dashboard's own API (`/api`)
-is documented in the app, on its **API reference** page.
+This page covers every route, grouped as the document groups them. **Inference** is what any key
+reaches; the **Chat API** needs a paired device's key; the **Dashboard API** and **Ops** belong to
+the owner (the dashboard's session or an owner key), and **Agent runtime** to an agent container's
+own token. Each operation names its capability and who holds it. Developers who only build on
+lmgw can download the smaller developer document, which leaves the owner's plane out.

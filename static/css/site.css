@@ -306,3 +306,13 @@ details.example pre { margin-top: 8px; }
 }
 
 .page-head .lockup { display: block; height: 112px; width: auto; max-width: 70vw; margin-bottom: 18px; }
+
+/* API reference: group headings (x-lmgw-group), deprecated badge, download list */
+.api-nav h4.group { font-size: .8rem; color: var(--accent); margin: 26px 0 4px; padding-top: 10px; border-top: 1px solid var(--border); }
+.api-nav h5 { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3); margin: 14px 0 4px; font-weight: 500; }
+.api-main h2.group { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--border); }
+.api-main h3.tag { margin: 36px 0 12px; }
+.badge { font-size: .7rem; font-weight: 500; color: var(--amber); border: 1px solid currentColor; border-radius: 4px; padding: 1px 6px; vertical-align: middle; text-transform: uppercase; letter-spacing: .04em; }
+.downloads { margin: 8px 0 0; padding-left: 1.2em; color: var(--text-2); font-size: .92rem; }
+.op .media { margin: 4px 0; }
+.op .arm { margin: 6px 0 6px 12px; padding-left: 10px; border-left: 2px solid var(--border); }
