@@ -57,6 +57,17 @@ documented API, under a device key of its own. Version 0.1.0 is the first releas
   Kai's settings exist too, behind a switch that is off by default.
 - **Updates.** Kai checks its releases on GitHub and offers a new version in a notification.
 
+## Screenshots
+
+{{ <shot src="kai-desktop.png" alt="Kai's overlays on a desktop: a recipe as a text overlay, a weather card, and the ring while Kai speaks" title="Overlays" caption="a text overlay, a weather card and the ring while Kai speaks" /> }}
+
+{% <gallery> %}
+{{ <shot src="kai-approval.png" alt="The approval card asking whether Kai may type a message" title="Approval card" caption="Kai asks before it types; answer with Enter, Esc or your voice" /> }}
+{{ <shot src="kai-settings.png" alt="The settings window's Tools page with a policy for each tool" title="Settings" caption="who may call each tool, and whether it asks first" /> }}
+{% </gallery> %}
+
+Stand-in content on a 1080p screen at 125% scaling. Select a screenshot for the full image.
+
 ## Requirements
 
 - **KDE Plasma 6 on Wayland,** with PipeWire. Kai is packaged as an RPM, built on current Fedora.
