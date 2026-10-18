@@ -109,6 +109,5 @@ them.
 
 ## Source and licence
 
-The source is at [github.com/lmgw-dev/kai](https://github.com/lmgw-dev/kai). Kai is
-source-available under the FSL-1.1-MIT licence, as lmgw is: each release becomes MIT two years
-after it ships.
+The source is at [github.com/lmgw-dev/kai](https://github.com/lmgw-dev/kai). Kai is under the MIT
+licence, as lmgw is.

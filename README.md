@@ -51,4 +51,4 @@ repository's Pages source must be set to **GitHub Actions** (Settings → Pages)
 The site (text, templates, styles and scripts) is under the MIT License ([LICENSE](LICENSE)). Two
 parts keep their own terms: IBM Plex in `static/fonts/` is under the SIL Open Font License 1.1
 (`static/fonts/OFL.txt`), and the logo and screenshots are lmgw's, from its repository
-([FSL-1.1-MIT](https://github.com/lmgw-dev/lmgw/blob/main/LICENSE.md)).
+([MIT](https://github.com/lmgw-dev/lmgw/blob/main/LICENSE.md)).

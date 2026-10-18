@@ -18,7 +18,7 @@
       <a class="btn primary" href="{{ config.extra.latest_release }}">Download lmgw {{ latest.tag | trim_start(pat="v") }}</a>
       <a class="btn" href="{{ get_url(path='@/lmgw.md') }}">What it does</a>
     </div>
-    <p class="meta">RPM for Fedora, usually an AppImage too · source on <a href="{{ config.extra.github_repo }}">GitHub</a> · FSL-1.1-MIT</p>
+    <p class="meta">RPM for Fedora, usually an AppImage too · source on <a href="{{ config.extra.github_repo }}">GitHub</a> · MIT</p>
     {% set hero = resize_image(path="img/shots/overview.png", width=1920, op="fit_width", format="webp", quality=90) %}
     <div class="shot hero-shot"><img src="{{ hero.url }}" width="{{ hero.width }}" height="{{ hero.height }}" alt="The lmgw dashboard: running models, GPU memory and live requests"></div>
   </div>
