@@ -120,8 +120,21 @@ detects the turns, transcribes them with a speech-to-text model, answers with a 
 speaks with a text-to-speech model. Pick the three under **Settings → Realtime**.
 
 Sessions take audio or text output, PCM16 at 24 kHz, `server_vad`, `semantic_vad` and manual
-turns, and barge-in. Function tools work as with OpenAI. WebRTC, SIP, ephemeral keys,
+turns, and barge-in. Function tools work as with OpenAI. SIP, ephemeral keys,
 transcription-only sessions and G.711 are not implemented yet.
+
+### WebRTC calls
+
+`POST /v1/realtime/calls` is OpenAI's WebRTC transport for the same sessions, in OpenAI's shape:
+post an SDP offer (raw `application/sdp`, or multipart with a `session` part) with your key and get
+the answer back. Audio is Opus over UDP, encrypted with DTLS-SRTP, and events travel on the
+`oai-events` data channel. `POST /v1/realtime/calls/{call_id}/hangup` ends a call. OpenAI's browser
+example and the Agents SDK's `OpenAIRealtimeWebRTC` work with the base URL pointed at lmgw.
+
+lmgw answers as ICE-lite with one host candidate, the address the POST arrived on, and has no STUN
+or TURN: the client must reach that address directly, on the LAN or through a VPN. The UDP port is
+the HTTP port's number unless **Settings → Realtime → WebRTC calls** names another; that group also
+lists the live calls.
 
 A session can also use the MCP servers lmgw serves, by label:
 
@@ -167,21 +180,34 @@ and clients and views get the structured part.
   backend's own tokenizer where it has one. `POST /v1/messages/count_tokens` and `POST /tokenize`
   are there for clients that expect Anthropic's or llama.cpp's routes.
 
-## Apps: device keys, the Chat and its feed
+## Apps: the device link, the Chat and its feed
 
-A desktop or phone client like [Kai](@/kai.md) needs more than model calls: Chat threads it shares
-with the dashboard, a feed of changes, a key of its own and a way to offer its own tools. lmgw has
-these as general features of its API, open to any client.
+A desktop or phone client like [Kai](@/kai.md) or [Kai mobile](@/kai-mobile.md) needs more than
+model calls: Chat threads it shares with the dashboard, a feed of changes, an identity of its own
+and a way to offer its own tools. lmgw has these as general features of its API, open to any client.
 
-- **Pairing.** **Usage → Keys & budgets → Pair a device…** mints a device key and shows it once,
-  inside an `lmgw-pair:?v=1&url=…&name=…&key=…` link that a client can register a URL scheme
-  handler for. A device key works on `/v1` like a client key, with its own scopes and budget, and
-  on the Chat API under `/chat/api/`. It never reaches the admin side.
+- **Pairing.** **Usage → Keys & budgets → Pair a device…** on the Devices card shows a pairing link
+  and a QR code, of the form `lmgw-pair:?v=2&name=…&url=…&fp=sha256:…&token=…`. It carries the
+  https URLs to try (LAN, VPN), the fingerprint of lmgw's own certificate authority and a one-time
+  token that works once and expires after ten minutes by default, so treat it as a credential. The
+  device makes its own key pair, enrols the public half over a connection pinned to that
+  fingerprint and gets a certificate. Both sides then show a short code, and the device opens
+  nothing until the owner confirms it on the card. A client can register a URL scheme handler for
+  the link.
+- **The device listener.** A paired device connects to a TLS listener of its own, off until the
+  first pairing turns it on, on the HTTP port's number plus one by default
+  (**Settings → Network & access → Devices**). Both sides check each other's certificate, and there
+  is no bearer key. The listener serves `/v1`, `/tokenize`, `/mcp`, the Chat API under
+  `/chat/api/` and a device's own `/mcp/host` link, and nothing else: no dashboard and no admin
+  side. The device's key policy sets its scopes and budget as for a client key.
 - **The feed.** `GET /chat/api/feed` is one Server-Sent Events stream per client. Stored events
-  (`thread.*`, `folder.*`, `profile.*`, `approval.*`, `task.*`, `device.revoked`) carry an SSE
-  `id:`, the cursor to resume from with `?since=<cursor>` or `Last-Event-ID`. Live events
-  (`turn.*`, `voice.*`, `hold`, `state`, `resync`, `revoked`) carry none, and `hello` says what is
-  live when the stream opens.
+  (`thread.*`, `folder.*`, `profile.*`, `message.*`, `approval.*`, `task.*`, `device.revoked`) carry
+  an SSE `id:`, the cursor to resume from with `?since=<cursor>` or `Last-Event-ID`. Live events
+  (`turn.*`, `voice.*`, `hold`, `state`, `resync`, `revoked`, `caught_up`) carry none, and `hello`
+  says what is live when the stream opens, with the device's URLs, its certificate and the
+  approvals still open. `keepalive_s` (up to `chat_feed_keepalive_max_s`, 900 by default) sets the
+  keep-alive a client wants, so a phone can hold the connection open in the background and get new
+  messages and open approvals without any push service.
 - **Ongoing conversations.** A folder can be marked as one conversation that continues.
   `POST /chat/api/folders/{id}/current` answers its current thread, starting a new one after the
   folder's idle time, or at once with `{"new": true}`.
@@ -193,10 +219,11 @@ these as general features of its API, open to any client.
   default is `null` inherits the Chat's default, it does not mean "none".
 
 [`lmgw-client`](https://github.com/lmgw-dev/lmgw/tree/main/crates/lmgw-client) is the Rust crate
-Kai and the dashboard's voice panel use for these: sans-IO, with the feed decoder, the realtime
+Kai, the core of Kai mobile and the dashboard's voice panel use for these: sans-IO, with the feed decoder, the realtime
 voice state and the wire types. The
 [client apps design record](https://github.com/lmgw-dev/lmgw/blob/main/docs/design/2026-10-06-client-apps-design.md)
-has the details.
+has the details of the feed and approvals; the pairing and the listener have a design record of
+their own in [docs/design](https://github.com/lmgw-dev/lmgw/tree/main/docs/design).
 
 ## Approvals for MCP tools
 
@@ -250,14 +277,15 @@ sees it as a call of `lmgw__job_result` and its result, in the order things happ
 ## Tools hosted by a device
 
 A device paired with a label under **hosts tools as** can serve MCP tools of its own. It opens a
-WebSocket to `GET /mcp/host` with its device key, and the roles reverse: lmgw is the MCP client on
+WebSocket to `GET /mcp/host` on the device listener, with its certificate, and the roles reverse: lmgw is the MCP client on
 the link, the device the server, one JSON-RPC message per text frame. lmgw's `initialize` carries
 the link's limits in `params._meta["lmgw/host_limits"]`, and each forwarded `tools/call` names who
 it runs for in `_meta["lmgw/caller"]` and the approval that let it through in
-`_meta["lmgw/approval"]`. The tools appear as `<label>__<tool>` to the owner and lmgw's own Chat,
-and to keys and agents whose tool scope names the label.
+`_meta["lmgw/approval"]`. The tools appear as `<label>__<tool>` to the owner and lmgw's own Chat.
+A key reaches them only when its `device_tools` grant names the label, and its tool scope then
+filters them like any server's tools.
 
-A key without the grant is refused `403 host_not_granted` before the upgrade, and a request with an
+A device without the grant is refused `403 host_not_granted` before the upgrade, and a request with an
 `Origin` header `403 cross_origin_refused`. A newer link of the same device takes over (close
 4000), a revoked key closes the link with 4003, and a device that declares the tasks capability can
 run its tools as MCP tasks, as above.

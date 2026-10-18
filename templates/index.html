@@ -38,8 +38,8 @@
         ways.</p></div>
       <div class="point"><h3>Cloud behind the same alias</h3><p>Point an alias at an OpenAI-compatible, Anthropic or Gemini
         model instead, or give a local model a cloud fallback for the hours the GPU is busy with something else.</p></div>
-      <div class="point"><h3>Voice</h3><p><code>/v1/realtime</code> speaks OpenAI's Realtime protocol and answers with your
-        own speech-to-text, chat and text-to-speech models. The Chat has dictation, read-aloud and a voice mode.</p></div>
+      <div class="point"><h3>Voice</h3><p><code>/v1/realtime</code> speaks OpenAI's Realtime protocol, over a WebSocket or WebRTC,
+        and answers with your own speech-to-text, chat and text-to-speech models. The Chat has dictation, read-aloud and a voice mode.</p></div>
       <div class="point"><h3>Tools in one place</h3><p>Your MCP servers behind one <code>/mcp</code> endpoint, plus built-in
         tools that search library documentation and your own knowledge bases. Calls can wait for your approval, and
         long-running ones report back when they are done.</p></div>
@@ -53,7 +53,7 @@
   <div class="wrap">
     <h2>lmgw and its clients</h2>
     <p class="lead">The gateway holds the models. Apps around it are clients of its API, separate programs to install
-      or leave out. The first, Kai, brings voice and desktop tools to KDE Plasma.</p>
+      or leave out. Kai brings voice and desktop tools to KDE Plasma, and Kai mobile is its Android sibling.</p>
     <div class="cards">
       <a class="card" href="{{ get_url(path='@/lmgw.md') }}">
         <div class="card-head"><span class="card-title"><img src="{{ get_url(path='img/lmgw-icon.svg') }}" width="40" height="40" alt=""><h3>lmgw</h3></span><span class="pill ok">Released · {{ latest.tag }}</span></div>
@@ -66,6 +66,12 @@
         <p>A voice client for the Plasma desktop: talk to your models from a global shortcut, keep one ongoing
           conversation, and let them use the desktop through tools you control. Every model call goes through lmgw.</p>
         <span class="more">About Kai →</span>
+      </a>
+      <a class="card" href="{{ get_url(path='@/kai-mobile.md') }}">
+        <div class="card-head"><span class="card-title"><img src="{{ get_url(path='img/kai-icon.svg') }}" width="40" height="40" alt=""><h3>Kai mobile</h3></span><span class="pill amber">Alpha · first release</span></div>
+        <p>The Android client: talk to your models by voice call or text, in the same ongoing conversation as Kai on the
+          desktop, with notifications and approvals from your gateway. It pairs with lmgw over its device link.</p>
+        <span class="more">About Kai mobile →</span>
       </a>
       <a class="card dashed" href="{{ get_url(path='@/docs/clients.md') }}">
         <div class="card-head"><h3>Your client</h3><span class="pill blue">Open API</span></div>
@@ -82,8 +88,9 @@
     <div>
       <h2>Built on an open API</h2>
       <p class="lead">Clients of lmgw get no private channel. The OpenAI and Anthropic dialects, the Realtime WebSocket and
-        MCP are open to any program, and what Kai needed beyond them went in as documented API: device keys, a Chat
-        feed, approvals, late tool results and tools hosted by the device.</p>
+        MCP are open to any program, and what Kai needed beyond them went in as documented API: the device link with
+        mutual TLS, a Chat feed that also works as a push channel, approvals, late tool results and tools hosted by the
+        device.</p>
       <p class="muted">The API reference on this site is generated from the gateway's own OpenAPI document, the one a
         running lmgw serves at <code>/api/openapi.json</code>.</p>
       <div class="actions" style="justify-content:flex-start">

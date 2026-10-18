@@ -27,7 +27,7 @@ Errors come in the shape of the protocol you called: OpenAI's on the OpenAI rout
 it has a fallback, which then answers instead and is named in `x-lmgw-fallback`.
 
 This page covers every route, grouped as the document groups them. **Inference** is what any key
-reaches; the **Chat API** needs a paired device's key; the **Dashboard API** and **Ops** belong to
+reaches; the **Chat API** needs a paired device, with its certificate on the device listener; the **Dashboard API** and **Ops** belong to
 the owner (the dashboard's session or an owner key), and **Agent runtime** to an agent container's
 own token. Each operation names its capability and who holds it. Developers who only build on
 lmgw can download the smaller developer document, which leaves the owner's plane out.

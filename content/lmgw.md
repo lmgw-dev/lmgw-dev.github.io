@@ -47,6 +47,8 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
   and stable-diffusion.cpp generates and edits images.
 - **VRAM-aware scheduling.** Admission works from measured GPU memory (NVML, or amdgpu sysfs). A
   model that doesn't fit waits, or pushes out an idle one, and idle models hand their memory back.
+  A model's footprint counts llama.cpp's compute buffers and the KV cache's real layout, and a
+  plan that cannot fit the card says so.
 - **From Hugging Face to a running model.** Download a GGUF together with its projector and draft
   model, and lmgw proposes llama.cpp settings from the file's metadata.
 - **Engine builds and benchmarks.** Build engine images from any git ref, with pull requests merged
@@ -63,9 +65,10 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
   another program holds the memory it needs. The `x-lmgw-fallback` response header names the alias that answered.
 - **Model capabilities in `/v1/models`.** Context length, output limit, modalities and reasoning
   controls, per model.
-- **Voice conversations.** `/v1/realtime` speaks OpenAI's Realtime protocol over a WebSocket and
-  answers with a cascade of your own models: turn detection inside lmgw, speech to text, a chat
-  model with tools, and text to speech.
+- **Voice conversations.** `/v1/realtime` speaks OpenAI's Realtime protocol over a WebSocket, and
+  `/v1/realtime/calls` over WebRTC (Opus over UDP, with no STUN or TURN, so the client must reach
+  lmgw directly on the LAN or through a VPN). Either answers with a cascade of your own models:
+  turn detection inside lmgw, speech to text, a chat model with tools, and text to speech.
 - **MCP gateway.** Stdio servers (isolated in Podman by default) and HTTP servers sit behind one
   `/mcp` endpoint, each under its own tool prefix, with their resources and MCP Apps views passed
   through.
@@ -85,6 +88,11 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
 
 **Operations and the desktop**
 
+- **Decision models and labs.** `/v1/systemone` relays typed questions to a local llama.cpp
+  decision model, or to an OpenAI-compatible upstream, and gets calibrated probabilities back. The
+  Decision lab compares and perturbs inputs and runs a question set over a CSV or JSONL file, and
+  the Image and Audio labs save the files their runs made. The labs keep their history in lmgw's
+  database.
 - **Usage and cost.** Every request is logged with its tokens, latency and price, with charts by
   alias and key.
 - **API keys with policy.** A key can carry alias and tool scopes, a budget, rate limits and a
@@ -95,9 +103,13 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
   Dictate, have replies read aloud, or talk in voice mode, all on your own speech models.
 - **Personality profiles.** A profile bundles a system prompt, reasoning settings and a voice.
   Give one to a thread or a folder, and try a draft out loud before you save it.
-- **Paired client apps.** A desktop or phone app pairs through a link and gets a device key of its
-  own. It shares the Chat with the dashboard, follows a feed of changes, and can host MCP tools of
-  its own that the Chat, agents and other clients use.
+- **Paired client apps over the device link.** A desktop or phone app pairs through a link or QR
+  code and enrols a key it made itself with lmgw's own certificate authority. You confirm a short
+  code on the Devices card, and from then on the app connects to a separate TLS listener with its
+  certificate (mutual TLS, no bearer key). The listener is off until the first pairing turns it on.
+  The app shares the Chat with the dashboard, follows a feed that also works as a push channel for a
+  phone, and can host MCP tools of its own that the Chat, agents and other clients use.
+  [Kai](@/kai.md) and [Kai mobile](@/kai-mobile.md) are the two apps built this way.
 - **A native window, a browser too.** The dashboard is written in Rust (Leptos, compiled to
   WebAssembly). On KDE Plasma the window takes the desktop's frame, fonts and colours. Bind lmgw to
   your network and the same dashboard works in a browser.

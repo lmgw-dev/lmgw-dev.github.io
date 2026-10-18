@@ -10,7 +10,10 @@ status_kind = "ok"
 
 Kai is a separate program that lives in the Plasma tray. It holds no models of its own: speech
 recognition, the chat model and the voice all run in lmgw, and Kai reaches them through lmgw's
-documented API, under a device key of its own. Version 0.1.0 is the first release.
+documented API, over lmgw's device link: a key of its own and a certificate, with mutual TLS and no
+bearer key. Version 0.2.0 moved Kai to that link and needs lmgw 0.5.0 or newer; 0.1.0 was the first
+release. Kai's Android sibling is [Kai mobile](@/kai-mobile.md), which holds the same ongoing
+conversation on a phone.
 
 ## What it does
 
@@ -39,7 +42,7 @@ documented API, under a device key of its own. Version 0.1.0 is the first releas
 - **A policy for every tool.** Each tool is allowed, allowed for trusted callers only, confirmed,
   denied or switched off, and each has a level that says who may call it at all: Kai's own
   conversation, you, trusted callers, or anyone lmgw lets through. Input tools are confirmed by
-  default. A confirmation is a dialog, and a call that waits for approval in an lmgw thread shows
+  default, and "Always allow" in a confirmation sets that tool to allow for trusted callers. A confirmation is a dialog, and a call that waits for approval in an lmgw thread shows
   as a card over the desktop, which you answer with Enter and Esc, or by saying yes or no.
 - **Overlays.** Tools show small borderless views over the desktop: text, sandboxed HTML, an image,
   an emote, a weather card. `overlay_app` shows the view of an MCP Apps tool, so Kai is a host for
@@ -71,10 +74,10 @@ Stand-in content on a 1080p screen at 125% scaling. Select a screenshot for the 
 ## Requirements
 
 - **KDE Plasma 6 on Wayland,** with PipeWire. Kai is packaged as an RPM, built on current Fedora.
-- **lmgw 0.4.3 or newer,** reachable from the desktop, with chat, speech recognition and
-  text-to-speech models set up as for voice mode in lmgw's Chat. The tools that look at the screen
-  need a chat model with vision.
-- **KWallet** (or another Secret Service) for the device key.
+- **lmgw 0.5.0 or newer,** reachable from the desktop, with its device listener on (pairing turns
+  it on) and chat, speech recognition and text-to-speech models set up as for voice mode in lmgw's
+  Chat. The tools that look at the screen need a chat model with vision.
+- **KWallet** (or another Secret Service) for Kai's key.
 
 ## Install
 
@@ -84,27 +87,39 @@ Download the RPM from [Kai's releases](https://github.com/lmgw-dev/kai/releases)
 sudo dnf install ./kai-*.x86_64.rpm
 ```
 
-Then start **Kai** from the application menu. It sits in the tray as "not paired".
+Then start **Kai** from the application menu. It sits in the tray as "not paired". Kai also offers
+new releases in a notification.
 
 ## Pair it with lmgw
 
-1. In lmgw's dashboard, open **Usage → Keys & budgets**, choose **Pair a device…** and give it a
-   name, the scopes it may use and, for the desktop tools, a label under **hosts tools as**.
-2. Click the pairing link lmgw shows (an `lmgw-pair:` link), or paste it into the dialog from
-   Kai's tray menu. Kai confirms, stores the key in KWallet and offers to start with Plasma.
-3. On its first connection Kai creates the Chat folder "Kai". In the dashboard, set the folder's
+1. In lmgw's dashboard, open **Usage → Keys & budgets**, and on the **Devices** card choose
+   **Pair a device…**. Give it a name, the scopes it may use and, for the desktop tools, a label
+   under **hosts tools as**.
+2. Click the pairing link lmgw shows, or paste it into the dialog from Kai's tray menu. Kai shows
+   what it is about to pair with and asks you to confirm. Then it makes a key of its own, enrols it
+   with lmgw over a connection pinned to lmgw's certificate fingerprint, stores the key in KWallet
+   and offers to start with Plasma.
+3. Kai shows a short code, and lmgw's Devices card shows the same one. When they match, click
+   **Confirm** on the card. Until you do, lmgw lets the device do nothing, and Kai says that it is
+   waiting for you.
+4. On its first connection Kai creates the Chat folder "Kai". In the dashboard, set the folder's
    model, switch on **Ongoing conversation** with its idle time, and set **Retention**. Kai names
    each step in a notification until the folder is ready.
-4. Press the talk key. Plasma asks you to bind it on first use.
+5. Press the talk key. Plasma asks you to bind it on first use.
 
-The device key is Kai's alone: named, revocable at any time on the same page, and kept out of
-lmgw's admin side.
+The key never leaves your desktop. The pairing is named, revocable at any time on the same card,
+and kept out of lmgw's admin side. Its certificate lasts a year by default; Kai says when it is
+due, and you pair again.
+
+**Coming from Kai 0.1.0?** Its pairing used a bearer key, which lmgw 0.5.0 no longer accepts. Kai
+tells you to pair again: do it from the Devices card, confirm the code, and Kai removes the old
+key from KWallet.
 
 ## Built on lmgw's API
 
 Kai adds no special case to lmgw. What it needed went into lmgw as general features, open to any
-client: device keys and pairing links, the Chat change feed, ongoing conversations, MCP approvals,
-late tool results, and devices that host MCP tools. [Build on lmgw](@/docs/clients.md) describes
+client: the device link and pairing links, the Chat change feed, ongoing conversations, MCP
+approvals, late tool results, and devices that host MCP tools. [Build on lmgw](@/docs/clients.md) describes
 them.
 
 ## Source and licence
