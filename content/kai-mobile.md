@@ -10,7 +10,7 @@ status_kind = "amber"
 Kai mobile is the phone side of [Kai](@/kai.md): the same ongoing conversation, held in lmgw's
 Chat, now on Android. It is a native app (Kotlin and Compose around a Rust core) that runs no
 models and has no account. Speech recognition, the chat model and the voice all come from your
-lmgw, and without an lmgw to pair with the app does nothing. Version 0.1.0 is the first release.
+lmgw, and without an lmgw to pair with the app does nothing. Version 0.1.1 is the first release.
 
 ## What it does
 
@@ -37,7 +37,7 @@ lmgw, and without an lmgw to pair with the app does nothing. Version 0.1.0 is th
 
 ## Status
 
-Alpha, and 0.1.0 is the first public release. It has had little time on real phones, so expect
+Alpha, and 0.1.1 is the first public release. It has had little time on real phones, so expect
 rough edges, and settings, screens and the wire to lmgw can still change between releases. Bug
 reports are welcome as [issues](https://github.com/lmgw-dev/kai-mobile/issues).
 

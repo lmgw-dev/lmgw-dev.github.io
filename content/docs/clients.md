@@ -223,7 +223,8 @@ Kai, the core of Kai mobile and the dashboard's voice panel use for these: sans-
 voice state and the wire types. The
 [client apps design record](https://github.com/lmgw-dev/lmgw/blob/main/docs/design/2026-10-06-client-apps-design.md)
 has the details of the feed and approvals; the pairing and the listener have a design record of
-their own in [docs/design](https://github.com/lmgw-dev/lmgw/tree/main/docs/design).
+their own in the
+[device link design record](https://github.com/lmgw-dev/lmgw/blob/main/docs/design/2026-10-14-device-link-design.md).
 
 ## Approvals for MCP tools
 
