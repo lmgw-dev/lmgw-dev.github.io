@@ -108,7 +108,8 @@ clients that check it keep working. The headers say what really happened:
 With no fallback, a request to a paused model fails with `503` and the code `gpu_hold`, so the
 fallback settings decide whether a request may leave the machine. Chat models take the
 gateway-wide hold fallback unless their own row says otherwise. The
-[headers table](/docs/api/#headers) lists all of them.
+[headers table](/docs/api/#headers) lists all of them. The [API compatibility](@/docs/compat.md)
+page shows which scenarios the OpenAI and Anthropic routes pass against the official SDKs.
 
 ## Voice
 

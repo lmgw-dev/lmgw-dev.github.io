@@ -30,4 +30,6 @@ This page covers every route, grouped as the document groups them. **Inference**
 reaches; the **Chat API** needs a paired device, with its certificate on the device listener; the **Dashboard API** and **Ops** belong to
 the owner (the dashboard's session or an owner key), and **Agent runtime** to an agent container's
 own token. Each operation names its capability and who holds it. Developers who only build on
-lmgw can download the smaller developer document, which leaves the owner's plane out.
+lmgw can download the smaller developer document, which leaves the owner's plane out. How the
+inference routes behave against the official SDKs, model by model, is on the
+[API compatibility](@/docs/compat.md) page.

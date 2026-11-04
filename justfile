@@ -33,6 +33,10 @@ openapi:
     jq -r '"openapi.json: lmgw " + .info.version + ", " + (.paths | length | tostring) + " paths"' static/openapi.json
     jq -r '"openapi-v1.json: lmgw " + .info.version + ", " + (.paths | length | tostring) + " paths"' static/openapi-v1.json
 
+# Regenerate data/compat.json (the compatibility page) from a run of lmgw's live API check: the newest under LMGW_DIR/target/compat/runs, or the results.json / run directory given; the lmgw version is read from LMGW_DIR/Cargo.toml unless given (a release tag, say 0.5.0)
+compat run="" version="":
+    scripts/compat-export.py {{run}} {{ if version != "" { "--lmgw-version " + version } else { "" } }} --lmgw-dir {{lmgw_dir}}
+
 # Refresh data/releases.json (lmgw) and data/releases-kai.json (Kai) from GitHub (the Pages workflow does this on every build)
 releases:
     gh api repos/lmgw-dev/lmgw/releases --jq "$(cat scripts/releases.jq)" > data/releases.json.new
@@ -45,7 +49,7 @@ releases:
 # Screenshot every page, light and dark, desktop and phone, into target/shots/ (needs `just serve` running)
 shots:
     mkdir -p target/shots
-    for p in "" lmgw kai docs/clients docs/api releases; do n="${p//\//-}"; n="${n:-home}"; \
+    for p in "" lmgw kai docs/clients docs/api docs/compat releases; do n="${p//\//-}"; n="${n:-home}"; \
       scripts/shot.py "http://127.0.0.1:1111/$p" "target/shots/$n-light.png"; \
       scripts/shot.py "http://127.0.0.1:1111/$p" "target/shots/$n-dark.png" --dark; \
       scripts/shot.py "http://127.0.0.1:1111/$p" "target/shots/$n-phone.png" --mobile --dark; \

@@ -113,3 +113,14 @@ any
 <span class="type">{{ <api.type s={s} /> }}</span>
 {%- endif -%}
 {% endcomponent api.body %}
+
+{#- One cell of the compatibility matrix (templates/compat.html): symbol and word, so the status
+    never rests on colour; a failing cell links to its findings. -#}
+{% component compat_cell(c: map) %}
+{%- if c.status == "pass" -%}<td class="st st-pass"><span aria-hidden="true">✓</span> pass</td>
+{%- elif c.status == "fail" -%}<td class="st st-fail"><span aria-hidden="true">✗</span> fail{% for f in c.findings %} <a class="fref" href="#finding-{{ f }}" title="{{ c.reason }}">{{ f }}</a>{% endfor %}</td>
+{%- elif c.status == "model" -%}<td class="st st-model"><span aria-hidden="true">◇</span> model{% for f in c.findings %} <a class="fref" href="#finding-{{ f }}" title="{{ c.reason }}">{{ f }}</a>{% endfor %}</td>
+{%- elif c.status == "unsupported" -%}<td class="st st-unsupported"><span aria-hidden="true">○</span> not supported yet{% for f in c.findings %} <a class="fref" href="#finding-{{ f }}">{{ f }}</a>{% endfor %}</td>
+{%- else -%}<td class="st st-skipped"><span aria-hidden="true">–</span> skipped{% for f in c.findings %} <a class="fref" href="#finding-{{ f }}">{{ f }}</a>{% endfor %}</td>
+{%- endif -%}
+{% endcomponent compat_cell %}

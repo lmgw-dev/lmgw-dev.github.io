@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{#- The compatibility matrix, from data/compat.json (`just compat` exports it from a run of lmgw's live
+    API check, sanitised by scripts/compat-export.py). Rows are scenarios, columns are the models
+    of the run grouped by how lmgw reached them; egresses without a run show as not run yet. -#}
+{% block content %}
+{% set d = load_data(path="data/compat.json") %}
+{% set total = d.cells | length %}
+{% set npass = [c for c in d.cells if c.status == "pass"] | length %}
+{% set nfail = [c for c in d.cells if c.status == "fail"] | length %}
+{% set nmodel = [c for c in d.cells if c.status == "model"] | length %}
+{% set ncol = d.models | length * (d.modes | length) %}
+{% set nrows = d.scenarios | length %}
+{% set symbols = {"pass": "✓", "fail": "✗", "model": "◇", "unsupported": "○", "skipped": "–"} %}
+<div class="wrap">
+  <header class="page-head">
+    <div class="kicker">{{ page.extra.kicker }}</div>
+    <h1>{{ page.title }}</h1>
+    <p class="lead">{{ page.description }}</p>
+  </header>
+  <article class="prose wide compat">
+    <p>This page is generated from a live check of a running lmgw. The check sends real requests
+    through the official <code>openai</code> {{ d.sdks.openai }} and <code>anthropic</code>
+    {{ d.sdks.anthropic }} Python SDKs and also reads the raw bytes on the wire, because an SDK can
+    accept what the protocol forbids. It covers lmgw's three inference routes,
+    {% for r in d.routes %}<code>{{ r.path }}</code> ({{ r.label }}){% if not loop.last %}{% if loop.index == d.routes | length - 1 %} and {% else %}, {% endif %}{% endif %}{% endfor %},
+    in plain and streaming mode, with {{ d.scenarios | length }} scenarios: text, system prompts,
+    multi-turn history, tool calls (none, nested, parallel, forced, a tool that fails), images,
+    structured output, stop sequences, token caps, reasoning with tool calls, token counting and
+    error shapes. Tool scenarios are multi-turn: the tool result goes back and the final answer is
+    read. Every model is reached through the alias a client would use, so each column is also a
+    different path through lmgw.</p>
+    <p>Run on <strong>{{ d.run_date }}</strong> against lmgw <strong>{{ d.lmgw_version }}</strong>:
+    <strong>{{ npass }} of {{ total }}</strong> checks passed, {{ nfail }} failed and {{ nmodel }}
+    came out differently because of the model. The failures are shown as they are, each with a
+    one-line reason <a href="#findings">below</a>.</p>
+
+    <h2 id="summary">Summary</h2>
+    <p class="muted">Checks per route and per way lmgw reached the model. The route-level checks
+    (unknown model, malformed body) are not counted here; they are in the full matrix.</p>
+    <div class="matrix-scroll"><table class="summary">
+      <thead><tr><th scope="col">Route</th>
+      {% for e in d.egresses %}<th scope="col">{{ e.label }}<span class="sub">{{ e.note }}</span></th>{% endfor %}</tr></thead>
+      <tbody>
+      {% for r in d.routes %}
+      <tr><th scope="row"><code>{{ r.path }}</code><span class="sub">{{ r.label }}</span></th>
+        {% for e in d.egresses %}
+        {% if e.models %}
+        {% set cs = [c for c in d.cells if c.route == r.id and c.egress == e.id] %}
+        <td>{% for s in d.statuses %}{% set n = [c for c in cs if c.status == s] | length %}{% if n > 0 %}<span class="cnt st-{{ s }}"><span aria-hidden="true">{{ symbols[s] }}</span> {{ n }} {% if s == "unsupported" %}not supported yet{% else %}{{ s }}{% endif %}</span>{% endif %}{% endfor %}<span class="sub">of {{ cs | length }}</span></td>
+        {% else %}<td class="notrun">not run yet</td>{% endif %}
+        {% endfor %}
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+
+    <h2 id="matrix">Full matrix</h2>
+    <p class="muted">One table per route, a plain and a streaming column per model. A number next
+    to a status points to the finding it belongs to.</p>
+    <ul class="legend" aria-label="Status legend">
+      <li class="st-pass"><span aria-hidden="true">✓</span> <b>pass</b> every protocol rule held, in the SDK and on the wire</li>
+      <li class="st-fail"><span aria-hidden="true">✗</span> <b>fail</b> a protocol rule was broken, or the request failed</li>
+      <li class="st-model"><span aria-hidden="true">◇</span> <b>model</b> the protocol held, but the model did not do what the scenario asked; this says nothing about lmgw</li>
+      <li class="st-unsupported"><span aria-hidden="true">○</span> <b>not supported yet</b> lmgw refused with its typed unsupported error</li>
+      <li class="st-skipped"><span aria-hidden="true">–</span> <b>skipped</b> not run: the GPU was held, a rate limit, or the model has no reasoning control</li>
+      <li class="st-na"><span aria-hidden="true">·</span> <b>n/a</b> the scenario does not apply to this route</li>
+    </ul>
+
+    {% for r in d.routes %}
+    <h3 id="route-{{ r.id }}"><code>{{ r.path }}</code> <span class="muted">{{ r.label }}</span></h3>
+    <div class="matrix-scroll"><table class="matrix">
+      <thead>
+        <tr><th rowspan="3" scope="col" class="scn">Scenario</th>
+        {% for e in d.egresses %}{% if e.models %}<th colspan="{{ e.models | length * (d.modes | length) }}" scope="colgroup" class="grp">{{ e.label }}<span class="sub">{{ e.note }}</span></th>{% endif %}{% endfor %}<th rowspan="3" scope="col" class="grp notrun">Not run yet<span class="sub">{% for e in d.egresses %}{% if not e.models %}{{ e.label }} ({{ e.note }}){% if not loop.last %}, {% endif %}{% endif %}{% endfor %}</span></th></tr>
+        <tr>{% for e in d.egresses %}{% for m in e.models %}<th colspan="{{ d.modes | length }}" scope="colgroup" class="mdl">{% if m.family %}<span class="sub">{{ m.family }}</span>{% endif %}<code>{{ m.id }}</code></th>{% endfor %}{% endfor %}</tr>
+        <tr>{% for e in d.egresses %}{% for m in e.models %}{% for mo in d.modes %}<th scope="col" class="mode">{{ mo }}</th>{% endfor %}{% endfor %}{% endfor %}</tr>
+      </thead>
+      <tbody>
+      {% for s in d.scenarios %}
+      {% set first_row = loop.first %}
+      {% set rc = [c for c in d.cells if c.route == r.id and c.scenario == s.id] %}
+      {% set whole = [c for c in rc if c.model == "*"] %}
+      <tr>
+        <th scope="row" class="scn"><code>{{ s.id }}</code><span class="sub">{{ s.title }}</span></th>
+        {% if whole | length > 0 %}
+        {% set c = whole | first %}
+        <td colspan="{{ ncol }}" class="st st-{{ c.status }} wholerow"><span aria-hidden="true">{{ symbols[c.status] }}</span> {{ c.status }}{% if c.findings %}{% for f in c.findings %} <a class="fref" href="#finding-{{ f }}">{{ f }}</a>{% endfor %}{% endif %} <span class="sub">checked once for the route, with a made-up alias</span></td>
+        {% if first_row %}<td rowspan="{{ nrows }}" class="notrun">not run yet</td>{% endif %}
+        {% else %}
+        {% for e in d.egresses %}
+        {% if e.models %}
+        {% for m in e.models %}{% for mo in d.modes %}
+        {% set hit = [c for c in rc if c.model == m.id and c.mode == mo] %}
+        {% if hit | length > 0 %}{{ <compat_cell c={hit | first} /> }}{% else %}<td class="st st-na"><span aria-hidden="true">·</span><span class="visually-hidden">not applicable</span></td>{% endif %}
+        {% endfor %}{% endfor %}
+        {% endif %}
+        {% endfor %}
+        {% if first_row %}<td rowspan="{{ nrows }}" class="notrun">not run yet</td>{% endif %}
+        {% endif %}
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+    {% endfor %}
+
+    <h2 id="findings">Failures and model notes</h2>
+    <p class="muted">Each distinct finding once, with where it shows up. Statuses are as in the
+    legend: a fail is a protocol rule lmgw did not meet, a model note is what the model did.</p>
+    <table class="findings stack">
+      <thead><tr><th>#</th><th>Status</th><th>Route</th><th>What happens</th><th>Where</th></tr></thead>
+      <tbody>
+      {% for f in d.findings %}
+      <tr id="finding-{{ f.id }}">
+        <td class="name">{{ f.id }}</td>
+        <td class="st st-{{ f.status }}"><span aria-hidden="true">{{ symbols[f.status] }}</span> {{ f.status }}</td>
+        <td><code>{{ f.route }}</code></td>
+        <td>{{ f.reason }}</td>
+        <td class="where">{{ f.count }} {% if f.count == 1 %}check{% else %}checks{% endif %}, {{ f.modes | join(sep=" and ") }}: {% for s in f.scenarios %}<code>{{ s }}</code>{% if not loop.last %}, {% endif %}{% endfor %}<span class="sub">{% for m in f.models %}{{ m }}{% if not loop.last %}, {% endif %}{% endfor %}</span></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <h2 id="how">How to read this</h2>
+    <ul>
+      <li>The matrix shows what one run found, on the date above, with the models named in the
+      columns. A model that passes here may still fail on another prompt.</li>
+      <li>Columns marked <em>not run yet</em> have no result. That is a gap in the check, not a pass.</li>
+      <li>Only the status of each check and the reason for a failure are published, not the
+      requests or the answers.</li>
+    </ul>
+  </article>
+</div>
+{% endblock content %}

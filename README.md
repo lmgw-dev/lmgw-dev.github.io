@@ -10,6 +10,7 @@ JavaScript, no tracking and no third-party requests: fonts and images are served
 just serve      # live preview on http://127.0.0.1:1111 (fetches the pinned Zola into .tools/ first)
 just build      # build into public/, as the Pages workflow does
 just check      # build and check every link, external ones included
+just compat     # refresh data/compat.json from a run of lmgw's live API check (see below)
 just shots      # screenshots of every page, light, dark and phone width, into target/shots/
 ```
 
@@ -26,6 +27,7 @@ just shots      # screenshots of every page, light, dark and phone width, into t
 | `static/img/shots/` | Dashboard screenshots, from lmgw's `docs/screenshots/`. The build makes WebP copies for the page and links the PNGs. |
 | `static/openapi.json` | lmgw's complete OpenAPI document (`/api/openapi.json`); `templates/api.html` renders the API reference from it. |
 | `static/openapi-v1.json` | The developer document (`/v1/openapi.json`), offered as a second download on the API page only. |
+| `data/compat.json` | The sanitised result of lmgw's live API check, for the compatibility page (`templates/compat.html`). |
 | `data/releases.json`, `data/releases-kai.json` | The lmgw and Kai releases from GitHub, trimmed by `scripts/releases.jq`. |
 | `tools.env` | The Zola version and its SHA-256, used by `just` and by the workflow alike. |
 
@@ -36,6 +38,16 @@ just shots      # screenshots of every page, light, dark and phone width, into t
   example, which prints what `GET /api/openapi.json` serves, and without `admin` the developer
   document of `GET /v1/openapi.json`; `LMGW_DIR` points at the checkout, default `../lmgw`).
   Commit the new `static/openapi.json` and `static/openapi-v1.json`.
+- **The compatibility page** (`/docs/compat/`) is generated from `data/compat.json`, which
+  `just compat` writes from a run of lmgw's live check (`scripts/compat-live.sh` in the lmgw
+  repository). By default it takes the newest run under `$LMGW_DIR/target/compat/runs`
+  (`LMGW_DIR` default `../lmgw`); `just compat <results.json or run dir> <lmgw version>` takes a
+  specific run and names the version tested (default: the version in the checkout's `Cargo.toml`).
+  `scripts/compat-export.py` builds the file from an allowlist: scenario, route, mode, model,
+  status and a plain-sentence reason per failure, plus the run date and SDK versions. Nothing
+  from the run's requests, answers, URLs, usage or cost passes, and a field or rule the script
+  doesn't know stops the export until someone decides what to publish. Commit the new
+  `data/compat.json`.
 - **The release lists** of lmgw and Kai are fetched on every Pages build, which also runs daily,
   so a new release shows up within a day without a commit. `just releases` refreshes the committed
   copies, which the build falls back to.

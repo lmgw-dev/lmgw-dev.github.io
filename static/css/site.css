@@ -307,6 +307,45 @@ details.example pre { margin-top: 8px; }
 
 .page-head .lockup { display: block; height: 112px; width: auto; max-width: 70vw; margin-bottom: 18px; }
 
+/* Compatibility matrix: status is a symbol and a word, colour only adds to it */
+.compat .sub { display: block; color: var(--text-3); font-size: .78rem; font-weight: 400; line-height: 1.35; }
+.compat .matrix-scroll { overflow-x: auto; margin: 0 0 1.6em; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); }
+.compat .matrix-scroll table { margin: 0; }
+.compat table.matrix { font-size: .8rem; width: 100%; }
+.compat table.matrix th, .compat table.matrix td { padding: 4px 6px; vertical-align: middle; }
+.compat table.matrix td.st { white-space: nowrap; text-align: left; }
+.compat .matrix th.scn { position: sticky; left: 0; z-index: 1; background: var(--surface); min-width: 11rem; max-width: 14rem; border-right: 1px solid var(--border); font-weight: 400; }
+.compat .matrix th.scn code { background: none; border: 0; padding: 0; color: var(--text); font-size: .85rem; }
+.compat .matrix thead th { text-align: center; }
+.compat .matrix thead th.scn { text-align: left; }
+.compat .matrix th.grp { color: var(--text); border-left: 1px solid var(--border); }
+.compat .matrix th.mdl { border-left: 1px solid var(--border); }
+.compat .matrix th.mdl code { background: none; border: 0; padding: 0; font-size: .74rem; overflow-wrap: anywhere; }
+.compat .matrix th.mode { color: var(--text-3); font-weight: 400; }
+.compat .matrix tbody tr:hover td, .compat .matrix tbody tr:hover th { background: var(--surface-hi); }
+.compat td.notrun, .compat th.notrun { text-align: center; color: var(--text-3); font-style: italic; background: repeating-linear-gradient(135deg, transparent 0 8px, var(--bg0) 8px 16px); border-left: 1px solid var(--border); min-width: 7rem; }
+.compat th.notrun { font-style: normal; }
+.compat td.wholerow { text-align: left; }
+.compat .st-pass { color: var(--ok); }
+.compat .st-fail { color: var(--err); }
+.compat .st-model { color: var(--amber); }
+.compat .st-unsupported { color: var(--violet); }
+.compat .st-skipped, .compat .st-na { color: var(--text-3); }
+.compat td.st-pass { background: var(--ok-bg); }
+.compat td.st-fail { background: var(--err-bg); }
+.compat td.st-model { background: var(--amber-bg); }
+.compat td.st-na { text-align: center; }
+.compat .fref { font-size: .72rem; vertical-align: super; font-weight: 600; margin-left: 1px; }
+.compat .summary td, .compat .summary th { vertical-align: top; }
+.compat .summary .cnt { display: block; white-space: nowrap; }
+.compat .legend { list-style: none; padding: 0; display: grid; gap: 4px 28px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin: 12px 0 28px; font-size: .9rem; }
+.compat .legend li { margin: 0; color: var(--text-2); }
+.compat .legend li > span:first-child { display: inline-block; width: 1.2em; text-align: center; font-weight: 600; }
+.compat .legend b { font-weight: 600; margin-right: .3em; }
+.compat table.findings td.where .sub { margin-top: 2px; overflow-wrap: anywhere; }
+.compat table.findings td.st, .compat table.findings td:nth-child(3) { white-space: nowrap; }
+.compat table.findings tr:target { background: var(--accent-bg); }
+
 /* API reference: group headings (x-lmgw-group), deprecated badge, download list */
 .api-nav h4.group { font-size: .8rem; color: var(--accent); margin: 26px 0 4px; padding-top: 10px; border-top: 1px solid var(--border); }
 .api-nav h5 { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3); margin: 14px 0 4px; font-weight: 500; }

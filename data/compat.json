@@ -1,0 +1,3744 @@
+{
+ "lmgw_version": "0.5.0",
+ "run_date": "2026-11-04",
+ "sdks": {
+  "openai": "3.45.0",
+  "anthropic": "2.4.0"
+ },
+ "statuses": [
+  "pass",
+  "fail",
+  "model",
+  "unsupported",
+  "skipped"
+ ],
+ "routes": [
+  {
+   "id": "chat",
+   "label": "Chat Completions",
+   "path": "/v1/chat/completions"
+  },
+  {
+   "id": "responses",
+   "label": "Responses",
+   "path": "/v1/responses"
+  },
+  {
+   "id": "messages",
+   "label": "Anthropic Messages",
+   "path": "/v1/messages"
+  }
+ ],
+ "modes": [
+  "plain",
+  "stream"
+ ],
+ "scenarios": [
+  {
+   "id": "text",
+   "title": "One-word answer"
+  },
+  {
+   "id": "system",
+   "title": "System prompt obeyed"
+  },
+  {
+   "id": "multi_turn",
+   "title": "Two text turns, the first answer replayed as history"
+  },
+  {
+   "id": "tool_noargs",
+   "title": "Tool without arguments, result sent back, final answer"
+  },
+  {
+   "id": "tool_nested",
+   "title": "Tool with object and array arguments, result, replay"
+  },
+  {
+   "id": "tool_parallel",
+   "title": "Two tool calls in one turn, both results, final answer"
+  },
+  {
+   "id": "tool_error",
+   "title": "Tool result flagged as an error"
+  },
+  {
+   "id": "tool_forced",
+   "title": "tool_choice naming one of two tools"
+  },
+  {
+   "id": "tool_none",
+   "title": "tool_choice none with tools present"
+  },
+  {
+   "id": "image",
+   "title": "Image input"
+  },
+  {
+   "id": "json_schema",
+   "title": "Structured output (JSON schema)"
+  },
+  {
+   "id": "stop_seq",
+   "title": "Stop sequence"
+  },
+  {
+   "id": "max_tokens",
+   "title": "Token cap: the length finish reason"
+  },
+  {
+   "id": "reasoning_tool",
+   "title": "Reasoning, tool call, replay with reasoning, final answer"
+  },
+  {
+   "id": "prev_response",
+   "title": "Second turn through previous_response_id"
+  },
+  {
+   "id": "count_tokens",
+   "title": "The route's token counter"
+  },
+  {
+   "id": "error_unknown_model",
+   "title": "Unknown model: 404 in the route's error shape"
+  },
+  {
+   "id": "error_malformed",
+   "title": "Truncated JSON body: 400 in the route's error shape"
+  }
+ ],
+ "egresses": [
+  {
+   "id": "kilo",
+   "label": "OpenAI-compatible upstream",
+   "note": "through an OpenAI-compatible gateway service",
+   "models": [
+    {
+     "id": "kilo/anthropic/claude-haiku-5.5",
+     "family": "Claude"
+    },
+    {
+     "id": "kilo/openai/gpt-6-luna",
+     "family": "GPT"
+    },
+    {
+     "id": "kilo/google/gemini-3.8-flash",
+     "family": "Gemini"
+    }
+   ]
+  },
+  {
+   "id": "anthropic",
+   "label": "Anthropic API",
+   "note": "native",
+   "models": [
+    {
+     "id": "anthropic/claude-haiku-5-5",
+     "family": ""
+    }
+   ]
+  },
+  {
+   "id": "openai",
+   "label": "OpenAI API",
+   "note": "native",
+   "models": []
+  },
+  {
+   "id": "aistudio",
+   "label": "Gemini API",
+   "note": "native",
+   "models": []
+  },
+  {
+   "id": "local",
+   "label": "llama.cpp",
+   "note": "local model",
+   "models": []
+  }
+ ],
+ "models": [
+  {
+   "id": "kilo/anthropic/claude-haiku-5.5",
+   "family": "Claude",
+   "egress": "kilo"
+  },
+  {
+   "id": "kilo/openai/gpt-6-luna",
+   "family": "GPT",
+   "egress": "kilo"
+  },
+  {
+   "id": "kilo/google/gemini-3.8-flash",
+   "family": "Gemini",
+   "egress": "kilo"
+  },
+  {
+   "id": "anthropic/claude-haiku-5-5",
+   "family": "",
+   "egress": "anthropic"
+  }
+ ],
+ "cells": [
+  {
+   "scenario": "text",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "text",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "text",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "text",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "text",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "system",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "system",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "system",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "system",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "system",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "multi_turn",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A call to a tool without arguments carries empty arguments (\"\") instead of {}.",
+   "findings": [
+    1
+   ]
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "A call to a tool without arguments carries empty arguments (\"\") instead of {}. The request that replays the tool call was rejected with HTTP 400: the call's input was not an object.",
+   "findings": [
+    1,
+    3
+   ]
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A call to a tool without arguments carries empty arguments (\"\") instead of {}. A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    8,
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_noargs",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "A call to a tool without arguments carries empty arguments (\"\") instead of {}. A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. The turn that replays the tool result ends as failed, without a response.completed event or a final answer. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    8,
+    5,
+    9,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_nested",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_parallel",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "model",
+   "reason": "After the tool's error result the model called the tool again instead of answering.",
+   "findings": [
+    13
+   ]
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "After the tool's error result the model called the tool again instead of answering.",
+   "findings": [
+    13
+   ]
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "model",
+   "reason": "After the tool's error result the model called the tool again instead of answering.",
+   "findings": [
+    13
+   ]
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "model",
+   "reason": "After the tool's error result the model called the tool again instead of answering.",
+   "findings": [
+    17
+   ]
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "After the tool's error result the model called the tool again instead of answering.",
+   "findings": [
+    15
+   ]
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "model",
+   "reason": "After the tool's error result the model called the tool again instead of answering.",
+   "findings": [
+    15
+   ]
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments.",
+   "findings": [
+    5
+   ]
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments.",
+   "findings": [
+    5
+   ]
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments.",
+   "findings": [
+    5
+   ]
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments.",
+   "findings": [
+    5
+   ]
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "tool_none",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "tool_none",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "image",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "image",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "image",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "image",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "json_schema",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "json_schema",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "json_schema",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "json_schema",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "json_schema",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "The text runs past the stop sequence instead of ending at it.",
+   "findings": [
+    2
+   ]
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "The text runs past the stop sequence instead of ending at it.",
+   "findings": [
+    2
+   ]
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
+   "findings": [
+    10
+   ]
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "The text runs past the stop sequence instead of ending at it. The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
+   "findings": [
+    11,
+    10
+   ]
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
+   "findings": [
+    10
+   ]
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
+   "findings": [
+    10
+   ]
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
+   "findings": [
+    10
+   ]
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "The text runs past the stop sequence instead of ending at it. The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
+   "findings": [
+    11,
+    10
+   ]
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
+   "findings": [
+    10
+   ]
+  },
+  {
+   "scenario": "stop_seq",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
+   "findings": [
+    10
+   ]
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A reply cut off by the token cap ends as completed, where OpenAI reports incomplete (max_output_tokens).",
+   "findings": [
+    6
+   ]
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A reply cut off by the token cap ends as completed, where OpenAI reports incomplete (max_output_tokens).",
+   "findings": [
+    6
+   ]
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A reply cut off by the token cap ends as completed, where OpenAI reports incomplete (max_output_tokens).",
+   "findings": [
+    6
+   ]
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "A reply cut off by the token cap ends as completed, where OpenAI reports incomplete (max_output_tokens).",
+   "findings": [
+    6
+   ]
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A reply cut off by the token cap ends as completed, where OpenAI reports incomplete (max_output_tokens).",
+   "findings": [
+    6
+   ]
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A reply cut off by the token cap ends as completed, where OpenAI reports incomplete (max_output_tokens).",
+   "findings": [
+    6
+   ]
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A reply cut off by the token cap ends as completed, where OpenAI reports incomplete (max_output_tokens).",
+   "findings": [
+    6
+   ]
+  },
+  {
+   "scenario": "max_tokens",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "A reply cut off by the token cap ends as completed, where OpenAI reports incomplete (max_output_tokens).",
+   "findings": [
+    6
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    12
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    12
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    12
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    12
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    12
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    12
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    16
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    16
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    16
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    16
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    16
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    16
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    14
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    14
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    14
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments. Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    5,
+    4
+   ]
+  },
+  {
+   "scenario": "prev_response",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "prev_response",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "prev_response",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "prev_response",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "prev_response",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "prev_response",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "prev_response",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "prev_response",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "findings": [
+    4
+   ]
+  },
+  {
+   "scenario": "count_tokens",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "count_tokens",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "count_tokens",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "count_tokens",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "count_tokens",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "count_tokens",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "count_tokens",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "count_tokens",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "count_tokens",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "/v1/responses/input_tokens is not supported yet (HTTP 405).",
+   "findings": [
+    7
+   ]
+  },
+  {
+   "scenario": "count_tokens",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "/v1/responses/input_tokens is not supported yet (HTTP 405).",
+   "findings": [
+    7
+   ]
+  },
+  {
+   "scenario": "count_tokens",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "fail",
+   "reason": "/v1/responses/input_tokens is not supported yet (HTTP 405).",
+   "findings": [
+    7
+   ]
+  },
+  {
+   "scenario": "count_tokens",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "fail",
+   "reason": "/v1/responses/input_tokens is not supported yet (HTTP 405).",
+   "findings": [
+    7
+   ]
+  },
+  {
+   "scenario": "error_unknown_model",
+   "route": "chat",
+   "mode": "plain",
+   "model": "*",
+   "egress": "",
+   "status": "pass"
+  },
+  {
+   "scenario": "error_unknown_model",
+   "route": "messages",
+   "mode": "plain",
+   "model": "*",
+   "egress": "",
+   "status": "pass"
+  },
+  {
+   "scenario": "error_unknown_model",
+   "route": "responses",
+   "mode": "plain",
+   "model": "*",
+   "egress": "",
+   "status": "pass"
+  },
+  {
+   "scenario": "error_malformed",
+   "route": "chat",
+   "mode": "plain",
+   "model": "*",
+   "egress": "",
+   "status": "pass"
+  },
+  {
+   "scenario": "error_malformed",
+   "route": "messages",
+   "mode": "plain",
+   "model": "*",
+   "egress": "",
+   "status": "pass"
+  },
+  {
+   "scenario": "error_malformed",
+   "route": "responses",
+   "mode": "plain",
+   "model": "*",
+   "egress": "",
+   "status": "pass"
+  }
+ ],
+ "findings": [
+  {
+   "status": "fail",
+   "route": "chat",
+   "reason": "A call to a tool without arguments carries empty arguments (\"\") instead of {}.",
+   "id": 1,
+   "count": 2,
+   "scenarios": [
+    "tool_noargs"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "stream"
+   ]
+  },
+  {
+   "status": "fail",
+   "route": "chat",
+   "reason": "The text runs past the stop sequence instead of ending at it.",
+   "id": 2,
+   "count": 2,
+   "scenarios": [
+    "stop_seq"
+   ],
+   "models": [
+    "kilo/openai/gpt-6-luna"
+   ],
+   "modes": [
+    "plain",
+    "stream"
+   ]
+  },
+  {
+   "status": "fail",
+   "route": "chat",
+   "reason": "The request that replays the tool call was rejected with HTTP 400: the call's input was not an object.",
+   "id": 3,
+   "count": 1,
+   "scenarios": [
+    "tool_noargs"
+   ],
+   "models": [
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "stream"
+   ]
+  },
+  {
+   "status": "fail",
+   "route": "responses",
+   "reason": "Streamed text events lack the logprobs field that the OpenAI SDK's types require.",
+   "id": 4,
+   "count": 46,
+   "scenarios": [
+    "text",
+    "system",
+    "multi_turn",
+    "tool_noargs",
+    "tool_nested",
+    "tool_parallel",
+    "tool_error",
+    "tool_none",
+    "image",
+    "json_schema",
+    "reasoning_tool",
+    "prev_response"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "kilo/openai/gpt-6-luna",
+    "kilo/google/gemini-3.8-flash",
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "stream"
+   ]
+  },
+  {
+   "status": "fail",
+   "route": "responses",
+   "reason": "A streamed tool call announces its arguments as {} and then streams the real ones, so the argument deltas do not add up to the final arguments.",
+   "id": 5,
+   "count": 24,
+   "scenarios": [
+    "tool_noargs",
+    "tool_nested",
+    "tool_parallel",
+    "tool_error",
+    "tool_forced",
+    "reasoning_tool"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "kilo/openai/gpt-6-luna",
+    "kilo/google/gemini-3.8-flash",
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "stream"
+   ]
+  },
+  {
+   "status": "fail",
+   "route": "responses",
+   "reason": "A reply cut off by the token cap ends as completed, where OpenAI reports incomplete (max_output_tokens).",
+   "id": 6,
+   "count": 8,
+   "scenarios": [
+    "max_tokens"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "kilo/openai/gpt-6-luna",
+    "kilo/google/gemini-3.8-flash",
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "plain",
+    "stream"
+   ]
+  },
+  {
+   "status": "fail",
+   "route": "responses",
+   "reason": "/v1/responses/input_tokens is not supported yet (HTTP 405).",
+   "id": 7,
+   "count": 4,
+   "scenarios": [
+    "count_tokens"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "kilo/openai/gpt-6-luna",
+    "kilo/google/gemini-3.8-flash",
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "plain"
+   ]
+  },
+  {
+   "status": "fail",
+   "route": "responses",
+   "reason": "A call to a tool without arguments carries empty arguments (\"\") instead of {}.",
+   "id": 8,
+   "count": 2,
+   "scenarios": [
+    "tool_noargs"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "stream"
+   ]
+  },
+  {
+   "status": "fail",
+   "route": "responses",
+   "reason": "The turn that replays the tool result ends as failed, without a response.completed event or a final answer.",
+   "id": 9,
+   "count": 1,
+   "scenarios": [
+    "tool_noargs"
+   ],
+   "models": [
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "stream"
+   ]
+  },
+  {
+   "status": "fail",
+   "route": "messages",
+   "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
+   "id": 10,
+   "count": 8,
+   "scenarios": [
+    "stop_seq"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "kilo/openai/gpt-6-luna",
+    "kilo/google/gemini-3.8-flash",
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "plain",
+    "stream"
+   ]
+  },
+  {
+   "status": "fail",
+   "route": "messages",
+   "reason": "The text runs past the stop sequence instead of ending at it.",
+   "id": 11,
+   "count": 2,
+   "scenarios": [
+    "stop_seq"
+   ],
+   "models": [
+    "kilo/openai/gpt-6-luna"
+   ],
+   "modes": [
+    "plain",
+    "stream"
+   ]
+  },
+  {
+   "status": "model",
+   "route": "chat",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "id": 12,
+   "count": 6,
+   "scenarios": [
+    "reasoning_tool"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "kilo/openai/gpt-6-luna",
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "plain",
+    "stream"
+   ]
+  },
+  {
+   "status": "model",
+   "route": "chat",
+   "reason": "After the tool's error result the model called the tool again instead of answering.",
+   "id": 13,
+   "count": 3,
+   "scenarios": [
+    "tool_error"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "plain",
+    "stream"
+   ]
+  },
+  {
+   "status": "model",
+   "route": "responses",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "id": 14,
+   "count": 3,
+   "scenarios": [
+    "reasoning_tool"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "kilo/openai/gpt-6-luna",
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "plain"
+   ]
+  },
+  {
+   "status": "model",
+   "route": "responses",
+   "reason": "After the tool's error result the model called the tool again instead of answering.",
+   "id": 15,
+   "count": 2,
+   "scenarios": [
+    "tool_error"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "plain"
+   ]
+  },
+  {
+   "status": "model",
+   "route": "messages",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "id": 16,
+   "count": 6,
+   "scenarios": [
+    "reasoning_tool"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "kilo/openai/gpt-6-luna",
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "plain",
+    "stream"
+   ]
+  },
+  {
+   "status": "model",
+   "route": "messages",
+   "reason": "After the tool's error result the model called the tool again instead of answering.",
+   "id": 17,
+   "count": 1,
+   "scenarios": [
+    "tool_error"
+   ],
+   "models": [
+    "anthropic/claude-haiku-5-5"
+   ],
+   "modes": [
+    "stream"
+   ]
+  }
+ ]
+}

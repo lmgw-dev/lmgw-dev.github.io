@@ -170,4 +170,6 @@ but loopback. [Build on lmgw](@/docs/clients.md) covers clients in more depth.
   and pinning engine images.
 - [docs/design/](https://github.com/lmgw-dev/lmgw/tree/main/docs/design) holds a design record for
   each major feature.
+- The [API compatibility](@/docs/compat.md) page shows how the OpenAI and Anthropic routes fare
+  against the official SDKs, model by model, from a live check.
 - The [releases](@/releases.md) page lists what changed in each version.
