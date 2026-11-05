@@ -99,13 +99,31 @@ RULE_TEXT = {
     "responses.function_call.arguments": NOARGS,
     "responses.status": REPLAY_FAILED,
     "text": REPLAY_FAILED,
-    "http": "The request that replays the tool call was rejected with HTTP 400: the call's input was "
-            "not an object.",
     "sdk.exception": REPLAY_FAILED,
+}
+# An HTTP error's sentence, by its detail; an unknown detail stops the export.
+HTTP_TEXT = [
+    (re.compile(r"tool_use\.input: Input should be an object"),
+     "The request that replays the tool call was rejected with HTTP 400: the call's input was not an "
+     "object."),
+    (re.compile(r"HTTP 504 \(api_error\): upstream timeout$"),
+     "The upstream did not answer within the timeout configured for it, so lmgw answered HTTP 504."),
+    (re.compile(r"HTTP 400 \(\w+\): Unsupported parameter: 'stop' is not supported with this model\.$"),
+     "The model refuses the stop parameter with HTTP 400, and lmgw passes that refusal on."),
+]
+# One sentence for a whole cell, when one of its violations names what went wrong for all of them.
+CELL_TEXT = [
+    (re.compile(r"^chat\.sse\.done_last: the last event is .*, not \[DONE\]$"),
+     "The upstream stopped sending partway through the stream, and lmgw kept the stream open with no "
+     "end and no error event until the client timed out."),
+]
+# Why a cell was not run, by the run's own reason.
+SKIP_TEXT = {
+    "the model card lists no reasoning control":
+        "Not run: lmgw's model card for this model lists no reasoning control.",
 }
 # A rule whose detail is free text only gets its sentence when the detail is the known one.
 DETAIL = {
-    "http": re.compile(r"tool_use\.input: Input should be an object"),
     "finish_reason": re.compile(r"'completed' maps to 'stop', expected \['length'\]"),
     "sdk.exception": re.compile(r"Didn't receive a `response\.completed` event"),
 }
@@ -155,12 +173,24 @@ def public_reason(r):
                 die(f"unmapped model note in {r['key']}: {n!r}; add a sentence to NOTE_TEXT")
             texts.append(hit[0])
     elif r["status"] == "fail" and r["violations"]:
+        for v in r["violations"]:
+            hit = [t for rx, t in CELL_TEXT if rx.match(re.sub(r"^turn \d+: ", "", v))]
+            if hit:
+                return hit[:1]
         texts = []
         for v in r["violations"]:
             rid = rule_of(v)
+            if rid == "http":
+                hit = [t for rx, t in HTTP_TEXT if rx.search(v)]
+                if not hit:
+                    die(f"unmapped HTTP error in {r['key']}: {v!r}; add a sentence to HTTP_TEXT")
+                texts.append(hit[0])
+                continue
             if rid not in RULE_TEXT or (rid in DETAIL and not DETAIL[rid].search(v)):
                 die(f"unmapped rule {rid!r} in {r['key']}; add a sentence to RULE_TEXT")
             texts.append(RULE_TEXT[rid])
+    elif r["status"] == "skipped" and r.get("reason") in SKIP_TEXT:
+        texts = [SKIP_TEXT[r["reason"]]]
     else:
         die(f"{r['key']}: status {r['status']!r} without a mappable reason; extend the export")
     return list(dict.fromkeys(texts))
