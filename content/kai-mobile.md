@@ -3,14 +3,14 @@ title = "Kai mobile"
 description = "The Android client of lmgw: talk to your own models from your phone, in the same ongoing conversation as Kai on the desktop, with notifications and approvals from your gateway. Every model call goes through your lmgw."
 [extra]
 kicker = "An Android client of lmgw"
-status = "Alpha · first release"
+status = "Alpha · 0.2.0"
 status_kind = "amber"
 +++
 
 Kai mobile is the phone side of [Kai](@/kai.md): the same ongoing conversation, held in lmgw's
 Chat, now on Android. It is a native app (Kotlin and Compose around a Rust core) that runs no
 models and has no account. Speech recognition, the chat model and the voice all come from your
-lmgw, and without an lmgw to pair with the app does nothing. Version 0.1.1 is the first release.
+lmgw, and without an lmgw to pair with the app does nothing. Version 0.2.0 needs lmgw 0.6.0; 0.1.1 was the first release.
 
 ## What it does
 
@@ -19,6 +19,11 @@ lmgw, and without an lmgw to pair with the app does nothing. Version 0.1.1 is th
   or half duplex), Bluetooth and headset routing, headset buttons and audio focus are handled:
   another app's audio pauses the call instead of ending it. If another device holds the
   conversation's call, Take over asks first.
+- **Browse every thread.** A Threads page lists your Chat folders and threads in lmgw's order, with
+  search across active, archived or all threads. Pin, archive, move, rename or delete from a
+  thread's menu. On a wide screen (a foldable, say) the list and the thread sit side by side.
+- **Voice in any thread.** Talk beside an opened thread starts a call there, or moves the running
+  call at its next quiet point.
 - **Or type.** The conversation is the one you also read in lmgw's dashboard and continue with Kai
   on the desktop: Markdown replies, tool notices under the answer, and a New conversation action.
 - **Assistant mode.** Set Kai as Android's assistant (a card in the app walks you through it) and
@@ -33,11 +38,13 @@ lmgw, and without an lmgw to pair with the app does nothing. Version 0.1.1 is th
   closed, with no push provider in between. Notifications show no content on the lock screen.
 - **Nothing in between.** The phone talks to your lmgw only, over mutual TLS, with a key made in
   the Android Keystore that never leaves it. No Google services, no analytics, no message cache.
+- **Settings in plain words,** and a choice between the shared Kai conversation and one only on this
+  phone.
 - Two-screen layouts, TalkBack and font-scale support.
 
 ## Status
 
-Alpha, and 0.1.1 is the first public release. It has had little time on real phones, so expect
+Alpha. It has had little time on real phones, so expect
 rough edges, and settings, screens and the wire to lmgw can still change between releases. Bug
 reports are welcome as [issues](https://github.com/lmgw-dev/kai-mobile/issues).
 
@@ -45,7 +52,6 @@ reports are welcome as [issues](https://github.com/lmgw-dev/kai-mobile/issues).
 
 - Images and attachments in messages.
 - A spoken yes or no for approvals (use the card or the notification).
-- A thread browser and search.
 - A local message cache: the conversation is read again at start.
 - Markdown tables.
 - Phone tools such as alarms and calendar, and screen context for the assistant.
@@ -58,7 +64,7 @@ reports are welcome as [issues](https://github.com/lmgw-dev/kai-mobile/issues).
 ## Requirements
 
 - **Android 12 (API 31) or later,** 64-bit ARM (`arm64-v8a`).
-- **lmgw 0.5.0 or newer,** with its device listener on (pairing turns it on) and a chat model.
+- **lmgw 0.6.0 or newer,** with its device listener on (pairing turns it on) and a chat model.
   Voice needs speech-to-text and text-to-speech models, set up as for voice mode in lmgw's Chat.
 - **A network path from the phone to lmgw's device port:** the same Wi-Fi, or a VPN such as
   WireGuard. A pairing link can carry several addresses and the app follows whichever answers. The

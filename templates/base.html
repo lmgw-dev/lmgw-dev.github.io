@@ -32,6 +32,7 @@
         <a href="{{ get_url(path='@/lmgw.md') }}"{% if here is starting_with(pat="/lmgw/") %} aria-current="page"{% endif %}>Gateway</a>
         <a href="{{ get_url(path='@/kai.md') }}"{% if here is starting_with(pat="/kai/") %} aria-current="page"{% endif %}>Kai</a>
         <a href="{{ get_url(path='@/kai-mobile.md') }}"{% if here is starting_with(pat="/kai-mobile/") %} aria-current="page"{% endif %}>Kai mobile</a>
+        <a href="{{ get_url(path='@/kai-firefox.md') }}"{% if here is starting_with(pat="/kai-firefox/") %} aria-current="page"{% endif %}>Kai for Firefox</a>
         <a href="{{ get_url(path='@/docs/clients.md') }}"{% if here is starting_with(pat="/docs/clients/") %} aria-current="page"{% endif %}>Build on lmgw</a>
         <a href="{{ get_url(path='@/docs/api.md') }}"{% if here is starting_with(pat="/docs/api/") %} aria-current="page"{% endif %}>API</a>
         <a href="{{ get_url(path='@/releases.md') }}"{% if here is starting_with(pat="/releases/") %} aria-current="page"{% endif %}>Releases</a>
@@ -49,7 +50,7 @@
 
   <footer class="site-footer">
     <div class="wrap footer-row">
-      <p>The source of lmgw, Kai and Kai mobile is published at <a href="{{ config.extra.github_org }}">github.com/lmgw-dev</a>.
+      <p>The source of lmgw, Kai, Kai mobile and Kai for Firefox is published at <a href="{{ config.extra.github_org }}">github.com/lmgw-dev</a>.
         All three are under the <a href="{{ config.extra.github_repo }}/blob/main/LICENSE.md">MIT License</a>.</p>
       <p class="muted">Linux desktop · Rust · no tracking on this site</p>
     </div>

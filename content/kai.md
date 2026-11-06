@@ -11,9 +11,10 @@ status_kind = "ok"
 Kai is a separate program that lives in the Plasma tray. It holds no models of its own: speech
 recognition, the chat model and the voice all run in lmgw, and Kai reaches them through lmgw's
 documented API, over lmgw's device link: a key of its own and a certificate, with mutual TLS and no
-bearer key. Version 0.2.0 moved Kai to that link and needs lmgw 0.5.0 or newer; 0.1.0 was the first
-release. Kai's Android sibling is [Kai mobile](@/kai-mobile.md), which holds the same ongoing
-conversation on a phone.
+bearer key. Version 0.3.0 adds Firefox integration and needs lmgw 0.6.0; 0.2.0 moved Kai to the device link, and
+0.1.0 was the first release. Kai's Android sibling is [Kai mobile](@/kai-mobile.md), which holds the
+same ongoing conversation on a phone, and [Kai for Firefox](@/kai-firefox.md) is the browser
+extension Kai works through.
 
 ## What it does
 
@@ -55,10 +56,17 @@ conversation on a phone.
   works towards. A model can write a new routine as a draft, which stays off until you enable it.
   Scripts reach Kai's tools and lmgw's models through `kai tool` and `kai model`, under the
   routine's own policy.
-- **A settings window** with the policy table, the desktop's providers, every setting in Kai's
+- **Firefox.** With the [Kai for Firefox](@/kai-firefox.md) extension, Kai's tools gain the
+  browser's: tabs, reading pages, tables and PDFs, screenshots for a vision model, pressing, filling
+  and choosing, numbered hints over the controls in view, bookmarks, history and downloads. Each site
+  is set to `act`, `read` or `none`; reading runs for you and acting asks first, and a switch lets
+  Kai act unasked on the tab you brought to the front. The rules also cover Kai's desktop tools on
+  Firefox's windows. Kai can announce what changed on a page and read a page aloud, and Firefox's
+  sidebar runs lmgw's Chat through Kai.
+- **A settings window** in plain words, with the policy table, the desktop's providers, every setting in Kai's
   configuration file, and lmgw's personality profiles. Configuration tools that let a model change
   Kai's settings exist too, behind a switch that is off by default.
-- **Updates.** Kai checks its releases on GitHub and offers a new version in a notification.
+- **Updates.** Kai checks its releases on GitHub and offers a new version in a notification. The RPM also needs `poppler-utils` and `mozilla-filesystem` and recommends `bubblewrap`.
 
 ## Screenshots
 
@@ -74,7 +82,7 @@ Stand-in content on a 1080p screen at 125% scaling. Select a screenshot for the 
 ## Requirements
 
 - **KDE Plasma 6 on Wayland,** with PipeWire. Kai is packaged as an RPM, built on current Fedora.
-- **lmgw 0.5.0 or newer,** reachable from the desktop, with its device listener on (pairing turns
+- **lmgw 0.6.0 or newer,** reachable from the desktop, with its device listener on (pairing turns
   it on) and chat, speech recognition and text-to-speech models set up as for voice mode in lmgw's
   Chat. The tools that look at the screen need a chat model with vision.
 - **KWallet** (or another Secret Service) for Kai's key.
@@ -111,7 +119,7 @@ The key never leaves your desktop. The pairing is named, revocable at any time o
 and kept out of lmgw's admin side. Its certificate lasts a year by default; Kai says when it is
 due, and you pair again.
 
-**Coming from Kai 0.1.0?** Its pairing used a bearer key, which lmgw 0.5.0 no longer accepts. Kai
+**Coming from Kai 0.1.0 or an older build?** Its pairing used a bearer key, which lmgw 0.5.0 no longer accepts. Kai
 tells you to pair again: do it from the Devices card, confirm the code, and Kai removes the old
 key from KWallet.
 

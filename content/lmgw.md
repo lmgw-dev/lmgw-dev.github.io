@@ -49,8 +49,18 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
   model that doesn't fit waits, or pushes out an idle one, and idle models hand their memory back.
   A model's footprint counts llama.cpp's compute buffers and the KV cache's real layout, and a
   plan that cannot fit the card says so.
+- **A machine check.** At start lmgw checks whether the computer can run local models: the
+  graphics card and its driver, NVIDIA's container toolkit, Podman, free space and the engine
+  downloads. It says what is missing in plain words, on the Settings → GPU page and the Overview.
+  Where it can, it installs the toolkit through a fixed root helper after your confirmation and one
+  password prompt; elsewhere it lists the commands to type.
+- **Find a model.** Type a model's name as you would say it, or paste a Hugging Face link. lmgw
+  searches the hub live and answers one card: the original, the upload and the file that fits your
+  card, judged before anything downloads. **Get it** downloads the file with its companions,
+  fits its context to the card and creates the model without starting it.
 - **From Hugging Face to a running model.** Download a GGUF together with its projector and draft
-  model, and lmgw proposes llama.cpp settings from the file's metadata.
+  model, and lmgw proposes llama.cpp settings from the file's metadata. Downloads resume after a
+  restart and are checked by length and hash.
 - **Engine builds and benchmarks.** Build engine images from any git ref, with pull requests merged
   in. Benchmarks measure prefill, decode, VRAM and tokens per joule.
 
@@ -59,10 +69,22 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
 - **OpenAI and Anthropic APIs on one port.** `/v1/chat/completions`, `/v1/responses`,
   `/v1/embeddings`, `/v1/rerank`, `/v1/messages` and more. A client in either dialect reaches any
   chat model.
+- **The OpenAI platform, natively.** An upstream of type `openai` is api.openai.com itself:
+  `/v1/responses` goes there as sent, with hosted tools, encrypted reasoning carried across turns,
+  service tiers priced as reported and budgets that never undercount. Other OpenAI-shaped providers
+  are `openai_compatible`.
+- **Anthropic, natively.** Between a Messages client and an Anthropic upstream, lmgw carries thinking
+  blocks with their signatures, blocks it doesn't model, citations, compaction and context
+  management, and Files API sources whole. Other routes get the nearest equivalent, and
+  `x-lmgw-params-ignored` names what was left out.
+- **Structured output everywhere.** `response_format`, `text.format` and `output_config.format` are
+  one field that each egress writes in its upstream's form. A model that can't produce it is refused
+  early with a clear error.
 - **Local or cloud behind one alias.** Streaming, tool calls and reasoning are translated in both
   directions, so switching an alias changes nothing for the client.
-- **Fallbacks.** A local model can name a cloud alias to take over while the GPU is on hold or
-  another program holds the memory it needs. The `x-lmgw-fallback` response header names the alias that answered.
+- **Fallbacks.** Every model and alias has one fallback, used for every reason it can't answer: the
+  GPU hold, a benchmark, memory taken by another program, a card that isn't set up, an exhausted
+  quota or an unreachable upstream. A fallback can hand on to its own. The `x-lmgw-fallback` response header names the alias that answered.
 - **Model capabilities in `/v1/models`.** Context length, output limit, modalities and reasoning
   controls, per model.
 - **Voice conversations.** `/v1/realtime` speaks OpenAI's Realtime protocol over a WebSocket, and
@@ -91,7 +113,7 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
 - **Decision models and labs.** `/v1/systemone` relays typed questions to a local llama.cpp
   decision model, or to an OpenAI-compatible upstream, and gets calibrated probabilities back. The
   Decision lab compares and perturbs inputs and runs a question set over a CSV or JSONL file, and
-  the Image and Audio labs save the files their runs made. The labs keep their history in lmgw's
+  the Image and Audio labs save the files their runs made, and the Voices lab collects candidate voice samples for the voice library. The labs keep their history in lmgw's
   database.
 - **Usage and cost.** Every request is logged with its tokens, latency and price, with charts by
   alias and key.
@@ -100,6 +122,8 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
 - **GPU hold.** A tray switch pauses local models while you need the card for something else.
   Speech models switched to the CPU keep serving.
 - **Chat, with voice.** Chat with any alias, with attachments, knowledge bases and MCP tools.
+  Built-in image and audio tools let a model generate, edit and upscale pictures and speak or
+  transcribe audio, with a card for re-rolling, varying and editing a result.
   Dictate, have replies read aloud, or talk in voice mode, all on your own speech models.
 - **Personality profiles.** A profile bundles a system prompt, reasoning settings and a voice.
   Give one to a thread or a folder, and try a draft out loud before you save it.
@@ -109,7 +133,9 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
   certificate (mutual TLS, no bearer key). The listener is off until the first pairing turns it on.
   The app shares the Chat with the dashboard, follows a feed that also works as a push channel for a
   phone, and can host MCP tools of its own that the Chat, agents and other clients use.
-  [Kai](@/kai.md) and [Kai mobile](@/kai-mobile.md) are the two apps built this way.
+  A paired device can also offer a file to another device of the same app, relayed through lmgw.
+  [Kai](@/kai.md), [Kai mobile](@/kai-mobile.md) and [Kai for Firefox](@/kai-firefox.md) (through
+  Kai) are the apps built this way.
 - **A native window, a browser too.** The dashboard is written in Rust (Leptos, compiled to
   WebAssembly). On KDE Plasma the window takes the desktop's frame, fonts and colours. Bind lmgw to
   your network and the same dashboard works in a browser.
@@ -119,7 +145,8 @@ The app window at 1920×1080, a 1080p screen at 125% scaling. Select a screensho
 - **Linux, x86_64.** Developed and used daily on Fedora, and packaged as an RPM or an AppImage.
   There is no macOS or Windows build.
 - **Podman** runs local models and stdio MCP servers. Cloud-only use needs no GPU.
-- **An NVIDIA GPU** is the tested path, with the driver and the NVIDIA Container Toolkit. AMD
+- **An NVIDIA GPU** is the tested path, with the driver and the NVIDIA Container Toolkit, which the
+  machine check can install. AMD
   works on a Ryzen APU with Vulkan images, as
   [docs/amd-arch.md](https://github.com/lmgw-dev/lmgw/blob/main/docs/amd-arch.md) describes.
 

@@ -40,6 +40,9 @@
         model instead, or give a local model a cloud fallback for the hours the GPU is busy with something else.</p></div>
       <div class="point"><h3>Voice</h3><p><code>/v1/realtime</code> speaks OpenAI's Realtime protocol, over a WebSocket or WebRTC,
         and answers with your own speech-to-text, chat and text-to-speech models. The Chat has dictation, read-aloud and a voice mode.</p></div>
+      <div class="point"><h3>Set up by a check</h3><p>At start lmgw checks the graphics card, driver, container toolkit and disk, says what is
+        missing in plain words and can install the toolkit for you. <b>Find a model</b> turns a name or a Hugging Face link into
+        the file that fits your card.</p></div>
       <div class="point"><h3>Tools in one place</h3><p>Your MCP servers behind one <code>/mcp</code> endpoint, plus built-in
         tools that search library documentation and your own knowledge bases. Calls can wait for your approval, and
         long-running ones report back when they are done.</p></div>
@@ -53,7 +56,7 @@
   <div class="wrap">
     <h2>lmgw and its clients</h2>
     <p class="lead">The gateway holds the models. Apps around it are clients of its API, separate programs to install
-      or leave out. Kai brings voice and desktop tools to KDE Plasma, and Kai mobile is its Android sibling.</p>
+      or leave out. Kai brings voice and desktop tools to KDE Plasma, Kai for Firefox lets it work in the browser, and Kai mobile is its Android sibling.</p>
     <div class="cards">
       <a class="card" href="{{ get_url(path='@/lmgw.md') }}">
         <div class="card-head"><span class="card-title"><img src="{{ get_url(path='img/lmgw-icon.svg') }}" width="40" height="40" alt=""><h3>lmgw</h3></span><span class="pill ok">Released · {{ latest.tag }}</span></div>
@@ -68,10 +71,16 @@
         <span class="more">About Kai →</span>
       </a>
       <a class="card" href="{{ get_url(path='@/kai-mobile.md') }}">
-        <div class="card-head"><span class="card-title"><img src="{{ get_url(path='img/kai-icon.svg') }}" width="40" height="40" alt=""><h3>Kai mobile</h3></span><span class="pill amber">Alpha · first release</span></div>
+        <div class="card-head"><span class="card-title"><img src="{{ get_url(path='img/kai-icon.svg') }}" width="40" height="40" alt=""><h3>Kai mobile</h3></span><span class="pill amber">Alpha · 0.2.0</span></div>
         <p>The Android client: talk to your models by voice call or text, in the same ongoing conversation as Kai on the
           desktop, with notifications and approvals from your gateway. It pairs with lmgw over its device link.</p>
         <span class="more">About Kai mobile →</span>
+      </a>
+      <a class="card" href="{{ get_url(path='@/kai-firefox.md') }}">
+        <div class="card-head"><span class="card-title"><img src="{{ get_url(path='img/kai-icon.svg') }}" width="40" height="40" alt=""><h3>Kai for Firefox</h3></span><span class="pill amber">First release · 0.1.0</span></div>
+        <p>A Firefox extension that gives Kai hands and eyes in the browser, and puts lmgw's Chat in a sidebar beside
+          the page. Site rules decide where Kai may read or act.</p>
+        <span class="more">About Kai for Firefox →</span>
       </a>
       <a class="card dashed" href="{{ get_url(path='@/docs/clients.md') }}">
         <div class="card-head"><h3>Your client</h3><span class="pill blue">Open API</span></div>
