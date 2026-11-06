@@ -25,7 +25,7 @@ import sys
 RESULT_KEYS = {"key", "requests", "scenario", "route", "mode", "usage", "seconds", "evidence",
                "notes", "reason", "model", "model_notes", "violations", "status"}
 RUN_KEYS = {"started", "base", "models", "routes", "modes", "scenarios", "requests", "cost_note",
-            "cost_usd", "unpriced_models", "totals", "previous", "seconds", "lmgw_version"}
+            "cost_usd", "unpriced_models", "totals", "previous", "previous_partial", "seconds", "lmgw_version"}
 TOP_KEYS = {"run", "diff", "results"}
 STATUSES = ["pass", "fail", "model", "unsupported", "skipped"]
 
@@ -53,6 +53,7 @@ SCENARIOS = {
     "max_tokens": "Token cap: the length finish reason",
     "reasoning_tool": "Reasoning, tool call, replay with reasoning, final answer",
     "prev_response": "Second turn through previous_response_id",
+    "compaction": "Conversation compacted on demand, then continued from the summary",
     "count_tokens": "The route's token counter",
     "error_unknown_model": "Unknown model: 404 in the route's error shape",
     "error_malformed": "Truncated JSON body: 400 in the route's error shape",
@@ -121,6 +122,8 @@ CELL_TEXT = [
 SKIP_TEXT = {
     "the model card lists no reasoning control":
         "Not run: lmgw's model card for this model lists no reasoning control.",
+    "the model card lists no on-demand compaction (summarize)":
+        "Not run: lmgw's model card for this model lists no on-demand compaction.",
 }
 # A rule whose detail is free text only gets its sentence when the detail is the known one.
 DETAIL = {

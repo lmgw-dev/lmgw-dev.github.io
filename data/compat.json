@@ -1,6 +1,6 @@
 {
  "lmgw_version": "0.5.0",
- "run_date": "2026-11-05",
+ "run_date": "2026-11-06",
  "sdks": {
   "openai": "3.45.0",
   "anthropic": "2.4.0"
@@ -97,6 +97,10 @@
   {
    "id": "count_tokens",
    "title": "The route's token counter"
+  },
+  {
+   "id": "compaction",
+   "title": "Conversation compacted on demand, then continued from the summary"
   },
   {
    "id": "error_unknown_model",
@@ -262,11 +266,7 @@
    "mode": "stream",
    "model": "kilo/openai/gpt-6-luna",
    "egress": "kilo",
-   "status": "fail",
-   "reason": "The upstream stopped sending partway through the stream, and lmgw kept the stream open with no end and no error event until the client timed out.",
-   "findings": [
-    3
-   ]
+   "status": "pass"
   },
   {
    "scenario": "text",
@@ -1938,11 +1938,7 @@
    "mode": "plain",
    "model": "kilo/anthropic/claude-haiku-5.5",
    "egress": "kilo",
-   "status": "model",
-   "reason": "After the tool's error result the model called the tool again instead of answering.",
-   "findings": [
-    9
-   ]
+   "status": "pass"
   },
   {
    "scenario": "tool_error",
@@ -1968,715 +1964,703 @@
    "egress": "anthropic",
    "status": "model",
    "reason": "After the tool's error result the model called the tool again instead of answering.",
-   "findings": [
-    9
-   ]
-  },
-  {
-   "scenario": "tool_error",
-   "route": "chat",
-   "mode": "plain",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "chat",
-   "mode": "plain",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "chat",
-   "mode": "stream",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "chat",
-   "mode": "stream",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "chat",
-   "mode": "stream",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "chat",
-   "mode": "stream",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "chat",
-   "mode": "stream",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "chat",
-   "mode": "stream",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "messages",
-   "mode": "plain",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "model",
-   "reason": "After the tool's error result the model called the tool again instead of answering.",
-   "findings": [
-    13
-   ]
-  },
-  {
-   "scenario": "tool_error",
-   "route": "messages",
-   "mode": "plain",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "messages",
-   "mode": "plain",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "messages",
-   "mode": "plain",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "messages",
-   "mode": "plain",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "messages",
-   "mode": "plain",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "messages",
-   "mode": "stream",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "messages",
-   "mode": "stream",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "messages",
-   "mode": "stream",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "messages",
-   "mode": "stream",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "model",
-   "reason": "After the tool's error result the model called the tool again instead of answering.",
-   "findings": [
-    13
-   ]
-  },
-  {
-   "scenario": "tool_error",
-   "route": "messages",
-   "mode": "stream",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "messages",
-   "mode": "stream",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "responses",
-   "mode": "plain",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "responses",
-   "mode": "plain",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "responses",
-   "mode": "plain",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "responses",
-   "mode": "plain",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "model",
-   "reason": "After the tool's error result the model called the tool again instead of answering.",
-   "findings": [
-    11
-   ]
-  },
-  {
-   "scenario": "tool_error",
-   "route": "responses",
-   "mode": "plain",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "responses",
-   "mode": "plain",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "responses",
-   "mode": "stream",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "model",
-   "reason": "After the tool's error result the model called the tool again instead of answering.",
-   "findings": [
-    11
-   ]
-  },
-  {
-   "scenario": "tool_error",
-   "route": "responses",
-   "mode": "stream",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "responses",
-   "mode": "stream",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "responses",
-   "mode": "stream",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "model",
-   "reason": "After the tool's error result the model called the tool again instead of answering.",
-   "findings": [
-    11
-   ]
-  },
-  {
-   "scenario": "tool_error",
-   "route": "responses",
-   "mode": "stream",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_error",
-   "route": "responses",
-   "mode": "stream",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "chat",
-   "mode": "plain",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "chat",
-   "mode": "plain",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "chat",
-   "mode": "plain",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "chat",
-   "mode": "plain",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "chat",
-   "mode": "plain",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "chat",
-   "mode": "plain",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "chat",
-   "mode": "stream",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "chat",
-   "mode": "stream",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "chat",
-   "mode": "stream",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "chat",
-   "mode": "stream",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "chat",
-   "mode": "stream",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "chat",
-   "mode": "stream",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "messages",
-   "mode": "plain",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "messages",
-   "mode": "plain",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "messages",
-   "mode": "plain",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "messages",
-   "mode": "plain",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "messages",
-   "mode": "plain",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "messages",
-   "mode": "plain",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "messages",
-   "mode": "stream",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "messages",
-   "mode": "stream",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "messages",
-   "mode": "stream",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "messages",
-   "mode": "stream",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "messages",
-   "mode": "stream",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "messages",
-   "mode": "stream",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "responses",
-   "mode": "plain",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "responses",
-   "mode": "plain",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "responses",
-   "mode": "plain",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "responses",
-   "mode": "plain",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "responses",
-   "mode": "plain",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "responses",
-   "mode": "plain",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "responses",
-   "mode": "stream",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "responses",
-   "mode": "stream",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "responses",
-   "mode": "stream",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "responses",
-   "mode": "stream",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "responses",
-   "mode": "stream",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_forced",
-   "route": "responses",
-   "mode": "stream",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "chat",
-   "mode": "plain",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "chat",
-   "mode": "plain",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "chat",
-   "mode": "plain",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "chat",
-   "mode": "plain",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "chat",
-   "mode": "plain",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "chat",
-   "mode": "plain",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "chat",
-   "mode": "stream",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "chat",
-   "mode": "stream",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "chat",
-   "mode": "stream",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "chat",
-   "mode": "stream",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "chat",
-   "mode": "stream",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "chat",
-   "mode": "stream",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "messages",
-   "mode": "plain",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "messages",
-   "mode": "plain",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "messages",
-   "mode": "plain",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "messages",
-   "mode": "plain",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "pass"
-  },
-  {
-   "scenario": "tool_none",
-   "route": "messages",
-   "mode": "plain",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "fail",
-   "reason": "The upstream did not answer within the timeout configured for it, so lmgw answered HTTP 504.",
    "findings": [
     7
    ]
   },
   {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "plain",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "plain",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "stream",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "chat",
+   "mode": "stream",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "model",
+   "reason": "After the tool's error result the model called the tool again instead of answering.",
+   "findings": [
+    11
+   ]
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "plain",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "plain",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "model",
+   "reason": "After the tool's error result the model called the tool again instead of answering.",
+   "findings": [
+    11
+   ]
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "stream",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "messages",
+   "mode": "stream",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "After the tool's error result the model called the tool again instead of answering.",
+   "findings": [
+    9
+   ]
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "plain",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "plain",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "stream",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_error",
+   "route": "responses",
+   "mode": "stream",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "plain",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "plain",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "stream",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "chat",
+   "mode": "stream",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "plain",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "plain",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "stream",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "messages",
+   "mode": "stream",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "plain",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "plain",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "stream",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_forced",
+   "route": "responses",
+   "mode": "stream",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "plain",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "plain",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "stream",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "chat",
+   "mode": "stream",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "tool_none",
+   "route": "messages",
+   "mode": "plain",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "pass"
+  },
+  {
    "scenario": "tool_none",
    "route": "messages",
    "mode": "plain",
@@ -3525,7 +3509,7 @@
    "status": "fail",
    "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
    "findings": [
-    4
+    3
    ]
   },
   {
@@ -3537,8 +3521,8 @@
    "status": "fail",
    "reason": "The text runs past the stop sequence instead of ending at it. The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
    "findings": [
-    5,
-    4
+    4,
+    3
    ]
   },
   {
@@ -3550,7 +3534,7 @@
    "status": "fail",
    "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
    "findings": [
-    4
+    3
    ]
   },
   {
@@ -3570,7 +3554,7 @@
    "status": "fail",
    "reason": "The model refuses the stop parameter with HTTP 400, and lmgw passes that refusal on.",
    "findings": [
-    6
+    5
    ]
   },
   {
@@ -3582,7 +3566,7 @@
    "status": "fail",
    "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
    "findings": [
-    4
+    3
    ]
   },
   {
@@ -3594,7 +3578,7 @@
    "status": "fail",
    "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
    "findings": [
-    4
+    3
    ]
   },
   {
@@ -3606,8 +3590,8 @@
    "status": "fail",
    "reason": "The text runs past the stop sequence instead of ending at it. The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
    "findings": [
-    5,
-    4
+    4,
+    3
    ]
   },
   {
@@ -3619,7 +3603,7 @@
    "status": "fail",
    "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
    "findings": [
-    4
+    3
    ]
   },
   {
@@ -3639,7 +3623,7 @@
    "status": "fail",
    "reason": "The model refuses the stop parameter with HTTP 400, and lmgw passes that refusal on.",
    "findings": [
-    6
+    5
    ]
   },
   {
@@ -3651,7 +3635,7 @@
    "status": "fail",
    "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
    "findings": [
-    4
+    3
    ]
   },
   {
@@ -3951,7 +3935,7 @@
    "status": "model",
    "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
    "findings": [
-    8
+    6
    ]
   },
   {
@@ -3963,7 +3947,7 @@
    "status": "model",
    "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
    "findings": [
-    8
+    6
    ]
   },
   {
@@ -3983,196 +3967,60 @@
    "status": "model",
    "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
    "findings": [
-    8
+    6
    ]
   },
   {
    "scenario": "reasoning_tool",
    "route": "chat",
-   "mode": "plain",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "skipped",
-   "reason": "Not run: lmgw's model card for this model lists no reasoning control.",
-   "findings": [
-    14
-   ]
-  },
-  {
-   "scenario": "reasoning_tool",
-   "route": "chat",
-   "mode": "plain",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "model",
-   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
-   "findings": [
-    8
-   ]
-  },
-  {
-   "scenario": "reasoning_tool",
-   "route": "chat",
-   "mode": "stream",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "model",
-   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
-   "findings": [
-    8
-   ]
-  },
-  {
-   "scenario": "reasoning_tool",
-   "route": "chat",
-   "mode": "stream",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "model",
-   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
-   "findings": [
-    8
-   ]
-  },
-  {
-   "scenario": "reasoning_tool",
-   "route": "chat",
-   "mode": "stream",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "reasoning_tool",
-   "route": "chat",
-   "mode": "stream",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "model",
-   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
-   "findings": [
-    8
-   ]
-  },
-  {
-   "scenario": "reasoning_tool",
-   "route": "chat",
-   "mode": "stream",
-   "model": "openai/gpt-6-luna",
-   "egress": "openai",
-   "status": "skipped",
-   "reason": "Not run: lmgw's model card for this model lists no reasoning control.",
-   "findings": [
-    14
-   ]
-  },
-  {
-   "scenario": "reasoning_tool",
-   "route": "chat",
-   "mode": "stream",
-   "model": "aistudio/gemini-3.8-flash",
-   "egress": "aistudio",
-   "status": "model",
-   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
-   "findings": [
-    8
-   ]
-  },
-  {
-   "scenario": "reasoning_tool",
-   "route": "messages",
-   "mode": "plain",
-   "model": "kilo/anthropic/claude-haiku-5.5",
-   "egress": "kilo",
-   "status": "model",
-   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
-   "findings": [
-    12
-   ]
-  },
-  {
-   "scenario": "reasoning_tool",
-   "route": "messages",
-   "mode": "plain",
-   "model": "kilo/openai/gpt-6-luna",
-   "egress": "kilo",
-   "status": "model",
-   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
-   "findings": [
-    12
-   ]
-  },
-  {
-   "scenario": "reasoning_tool",
-   "route": "messages",
-   "mode": "plain",
-   "model": "kilo/google/gemini-3.8-flash",
-   "egress": "kilo",
-   "status": "pass"
-  },
-  {
-   "scenario": "reasoning_tool",
-   "route": "messages",
-   "mode": "plain",
-   "model": "anthropic/claude-haiku-5-5",
-   "egress": "anthropic",
-   "status": "model",
-   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
-   "findings": [
-    12
-   ]
-  },
-  {
-   "scenario": "reasoning_tool",
-   "route": "messages",
    "mode": "plain",
    "model": "openai/gpt-6-luna",
    "egress": "openai",
    "status": "skipped",
    "reason": "Not run: lmgw's model card for this model lists no reasoning control.",
    "findings": [
-    16
+    12
    ]
   },
   {
    "scenario": "reasoning_tool",
-   "route": "messages",
+   "route": "chat",
    "mode": "plain",
    "model": "aistudio/gemini-3.8-flash",
    "egress": "aistudio",
    "status": "model",
    "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
    "findings": [
-    12
+    6
    ]
   },
   {
    "scenario": "reasoning_tool",
-   "route": "messages",
+   "route": "chat",
    "mode": "stream",
    "model": "kilo/anthropic/claude-haiku-5.5",
    "egress": "kilo",
    "status": "model",
    "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
    "findings": [
-    12
+    6
    ]
   },
   {
    "scenario": "reasoning_tool",
-   "route": "messages",
+   "route": "chat",
    "mode": "stream",
    "model": "kilo/openai/gpt-6-luna",
    "egress": "kilo",
    "status": "model",
    "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
    "findings": [
-    12
+    6
    ]
   },
   {
    "scenario": "reasoning_tool",
-   "route": "messages",
+   "route": "chat",
    "mode": "stream",
    "model": "kilo/google/gemini-3.8-flash",
    "egress": "kilo",
@@ -4180,43 +4028,43 @@
   },
   {
    "scenario": "reasoning_tool",
-   "route": "messages",
+   "route": "chat",
    "mode": "stream",
    "model": "anthropic/claude-haiku-5-5",
    "egress": "anthropic",
    "status": "model",
    "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
    "findings": [
-    12
+    6
    ]
   },
   {
    "scenario": "reasoning_tool",
-   "route": "messages",
+   "route": "chat",
    "mode": "stream",
    "model": "openai/gpt-6-luna",
    "egress": "openai",
    "status": "skipped",
    "reason": "Not run: lmgw's model card for this model lists no reasoning control.",
    "findings": [
-    16
+    12
    ]
   },
   {
    "scenario": "reasoning_tool",
-   "route": "messages",
+   "route": "chat",
    "mode": "stream",
    "model": "aistudio/gemini-3.8-flash",
    "egress": "aistudio",
    "status": "model",
    "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
    "findings": [
-    12
+    6
    ]
   },
   {
    "scenario": "reasoning_tool",
-   "route": "responses",
+   "route": "messages",
    "mode": "plain",
    "model": "kilo/anthropic/claude-haiku-5.5",
    "egress": "kilo",
@@ -4228,7 +4076,7 @@
   },
   {
    "scenario": "reasoning_tool",
-   "route": "responses",
+   "route": "messages",
    "mode": "plain",
    "model": "kilo/openai/gpt-6-luna",
    "egress": "kilo",
@@ -4240,7 +4088,7 @@
   },
   {
    "scenario": "reasoning_tool",
-   "route": "responses",
+   "route": "messages",
    "mode": "plain",
    "model": "kilo/google/gemini-3.8-flash",
    "egress": "kilo",
@@ -4248,7 +4096,7 @@
   },
   {
    "scenario": "reasoning_tool",
-   "route": "responses",
+   "route": "messages",
    "mode": "plain",
    "model": "anthropic/claude-haiku-5-5",
    "egress": "anthropic",
@@ -4260,7 +4108,7 @@
   },
   {
    "scenario": "reasoning_tool",
-   "route": "responses",
+   "route": "messages",
    "mode": "plain",
    "model": "openai/gpt-6-luna",
    "egress": "openai",
@@ -4272,7 +4120,7 @@
   },
   {
    "scenario": "reasoning_tool",
-   "route": "responses",
+   "route": "messages",
    "mode": "plain",
    "model": "aistudio/gemini-3.8-flash",
    "egress": "aistudio",
@@ -4284,7 +4132,7 @@
   },
   {
    "scenario": "reasoning_tool",
-   "route": "responses",
+   "route": "messages",
    "mode": "stream",
    "model": "kilo/anthropic/claude-haiku-5.5",
    "egress": "kilo",
@@ -4296,7 +4144,7 @@
   },
   {
    "scenario": "reasoning_tool",
-   "route": "responses",
+   "route": "messages",
    "mode": "stream",
    "model": "kilo/openai/gpt-6-luna",
    "egress": "kilo",
@@ -4308,7 +4156,7 @@
   },
   {
    "scenario": "reasoning_tool",
-   "route": "responses",
+   "route": "messages",
    "mode": "stream",
    "model": "kilo/google/gemini-3.8-flash",
    "egress": "kilo",
@@ -4316,7 +4164,7 @@
   },
   {
    "scenario": "reasoning_tool",
-   "route": "responses",
+   "route": "messages",
    "mode": "stream",
    "model": "anthropic/claude-haiku-5-5",
    "egress": "anthropic",
@@ -4328,7 +4176,7 @@
   },
   {
    "scenario": "reasoning_tool",
-   "route": "responses",
+   "route": "messages",
    "mode": "stream",
    "model": "openai/gpt-6-luna",
    "egress": "openai",
@@ -4340,7 +4188,7 @@
   },
   {
    "scenario": "reasoning_tool",
-   "route": "responses",
+   "route": "messages",
    "mode": "stream",
    "model": "aistudio/gemini-3.8-flash",
    "egress": "aistudio",
@@ -4348,6 +4196,142 @@
    "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
    "findings": [
     10
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    8
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    8
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    8
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "plain",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "skipped",
+   "reason": "Not run: lmgw's model card for this model lists no reasoning control.",
+   "findings": [
+    13
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "plain",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    8
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    8
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    8
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "pass"
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    8
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "stream",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "skipped",
+   "reason": "Not run: lmgw's model card for this model lists no reasoning control.",
+   "findings": [
+    13
+   ]
+  },
+  {
+   "scenario": "reasoning_tool",
+   "route": "responses",
+   "mode": "stream",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "model",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "findings": [
+    8
    ]
   },
   {
@@ -4589,6 +4573,142 @@
    "model": "aistudio/gemini-3.8-flash",
    "egress": "aistudio",
    "status": "pass"
+  },
+  {
+   "scenario": "compaction",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "skipped",
+   "reason": "Not run: lmgw's model card for this model lists no on-demand compaction.",
+   "findings": [
+    14
+   ]
+  },
+  {
+   "scenario": "compaction",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "skipped",
+   "reason": "Not run: lmgw's model card for this model lists no on-demand compaction.",
+   "findings": [
+    14
+   ]
+  },
+  {
+   "scenario": "compaction",
+   "route": "messages",
+   "mode": "plain",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "skipped",
+   "reason": "Not run: lmgw's model card for this model lists no on-demand compaction.",
+   "findings": [
+    14
+   ]
+  },
+  {
+   "scenario": "compaction",
+   "route": "messages",
+   "mode": "plain",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "compaction",
+   "route": "messages",
+   "mode": "plain",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "skipped",
+   "reason": "Not run: lmgw's model card for this model lists no on-demand compaction.",
+   "findings": [
+    14
+   ]
+  },
+  {
+   "scenario": "compaction",
+   "route": "messages",
+   "mode": "plain",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "skipped",
+   "reason": "Not run: lmgw's model card for this model lists no on-demand compaction.",
+   "findings": [
+    14
+   ]
+  },
+  {
+   "scenario": "compaction",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/anthropic/claude-haiku-5.5",
+   "egress": "kilo",
+   "status": "skipped",
+   "reason": "Not run: lmgw's model card for this model lists no on-demand compaction.",
+   "findings": [
+    14
+   ]
+  },
+  {
+   "scenario": "compaction",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/openai/gpt-6-luna",
+   "egress": "kilo",
+   "status": "skipped",
+   "reason": "Not run: lmgw's model card for this model lists no on-demand compaction.",
+   "findings": [
+    14
+   ]
+  },
+  {
+   "scenario": "compaction",
+   "route": "messages",
+   "mode": "stream",
+   "model": "kilo/google/gemini-3.8-flash",
+   "egress": "kilo",
+   "status": "skipped",
+   "reason": "Not run: lmgw's model card for this model lists no on-demand compaction.",
+   "findings": [
+    14
+   ]
+  },
+  {
+   "scenario": "compaction",
+   "route": "messages",
+   "mode": "stream",
+   "model": "anthropic/claude-haiku-5-5",
+   "egress": "anthropic",
+   "status": "pass"
+  },
+  {
+   "scenario": "compaction",
+   "route": "messages",
+   "mode": "stream",
+   "model": "openai/gpt-6-luna",
+   "egress": "openai",
+   "status": "skipped",
+   "reason": "Not run: lmgw's model card for this model lists no on-demand compaction.",
+   "findings": [
+    14
+   ]
+  },
+  {
+   "scenario": "compaction",
+   "route": "messages",
+   "mode": "stream",
+   "model": "aistudio/gemini-3.8-flash",
+   "egress": "aistudio",
+   "status": "skipped",
+   "reason": "Not run: lmgw's model card for this model lists no on-demand compaction.",
+   "findings": [
+    14
+   ]
   },
   {
    "scenario": "error_unknown_model",
@@ -4676,25 +4796,9 @@
   },
   {
    "status": "fail",
-   "route": "chat",
-   "reason": "The upstream stopped sending partway through the stream, and lmgw kept the stream open with no end and no error event until the client timed out.",
-   "id": 3,
-   "count": 1,
-   "scenarios": [
-    "text"
-   ],
-   "models": [
-    "kilo/openai/gpt-6-luna"
-   ],
-   "modes": [
-    "stream"
-   ]
-  },
-  {
-   "status": "fail",
    "route": "messages",
    "reason": "The stop reason is end_turn with no stop_sequence, where the matched stop sequence should be reported.",
-   "id": 4,
+   "id": 3,
    "count": 8,
    "scenarios": [
     "stop_seq"
@@ -4714,7 +4818,7 @@
    "status": "fail",
    "route": "messages",
    "reason": "The text runs past the stop sequence instead of ending at it.",
-   "id": 5,
+   "id": 4,
    "count": 2,
    "scenarios": [
     "stop_seq"
@@ -4731,7 +4835,7 @@
    "status": "fail",
    "route": "messages",
    "reason": "The model refuses the stop parameter with HTTP 400, and lmgw passes that refusal on.",
-   "id": 6,
+   "id": 5,
    "count": 2,
    "scenarios": [
     "stop_seq"
@@ -4745,16 +4849,36 @@
    ]
   },
   {
-   "status": "fail",
-   "route": "messages",
-   "reason": "The upstream did not answer within the timeout configured for it, so lmgw answered HTTP 504.",
+   "status": "model",
+   "route": "chat",
+   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
+   "id": 6,
+   "count": 8,
+   "scenarios": [
+    "reasoning_tool"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "kilo/openai/gpt-6-luna",
+    "anthropic/claude-haiku-5-5",
+    "aistudio/gemini-3.8-flash"
+   ],
+   "modes": [
+    "plain",
+    "stream"
+   ]
+  },
+  {
+   "status": "model",
+   "route": "chat",
+   "reason": "After the tool's error result the model called the tool again instead of answering.",
    "id": 7,
    "count": 1,
    "scenarios": [
-    "tool_none"
+    "tool_error"
    ],
    "models": [
-    "openai/gpt-6-luna"
+    "anthropic/claude-haiku-5-5"
    ],
    "modes": [
     "plain"
@@ -4762,7 +4886,7 @@
   },
   {
    "status": "model",
-   "route": "chat",
+   "route": "responses",
    "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
    "id": 8,
    "count": 8,
@@ -4782,16 +4906,15 @@
   },
   {
    "status": "model",
-   "route": "chat",
+   "route": "responses",
    "reason": "After the tool's error result the model called the tool again instead of answering.",
    "id": 9,
-   "count": 2,
+   "count": 1,
    "scenarios": [
     "tool_error"
    ],
    "models": [
-    "kilo/anthropic/claude-haiku-5.5",
-    "anthropic/claude-haiku-5-5"
+    "kilo/anthropic/claude-haiku-5.5"
    ],
    "modes": [
     "plain"
@@ -4799,7 +4922,7 @@
   },
   {
    "status": "model",
-   "route": "responses",
+   "route": "messages",
    "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
    "id": 10,
    "count": 8,
@@ -4819,53 +4942,14 @@
   },
   {
    "status": "model",
-   "route": "responses",
+   "route": "messages",
    "reason": "After the tool's error result the model called the tool again instead of answering.",
    "id": 11,
-   "count": 3,
-   "scenarios": [
-    "tool_error"
-   ],
-   "models": [
-    "kilo/anthropic/claude-haiku-5.5",
-    "anthropic/claude-haiku-5-5"
-   ],
-   "modes": [
-    "plain",
-    "stream"
-   ]
-  },
-  {
-   "status": "model",
-   "route": "messages",
-   "reason": "The model sent no reasoning content with its tool call, so the reasoning replay was not exercised.",
-   "id": 12,
-   "count": 8,
-   "scenarios": [
-    "reasoning_tool"
-   ],
-   "models": [
-    "kilo/anthropic/claude-haiku-5.5",
-    "kilo/openai/gpt-6-luna",
-    "anthropic/claude-haiku-5-5",
-    "aistudio/gemini-3.8-flash"
-   ],
-   "modes": [
-    "plain",
-    "stream"
-   ]
-  },
-  {
-   "status": "model",
-   "route": "messages",
-   "reason": "After the tool's error result the model called the tool again instead of answering.",
-   "id": 13,
    "count": 2,
    "scenarios": [
     "tool_error"
    ],
    "models": [
-    "kilo/anthropic/claude-haiku-5.5",
     "anthropic/claude-haiku-5-5"
    ],
    "modes": [
@@ -4877,7 +4961,7 @@
    "status": "skipped",
    "route": "chat",
    "reason": "Not run: lmgw's model card for this model lists no reasoning control.",
-   "id": 14,
+   "id": 12,
    "count": 2,
    "scenarios": [
     "reasoning_tool"
@@ -4894,7 +4978,7 @@
    "status": "skipped",
    "route": "responses",
    "reason": "Not run: lmgw's model card for this model lists no reasoning control.",
-   "id": 15,
+   "id": 13,
    "count": 2,
    "scenarios": [
     "reasoning_tool"
@@ -4910,8 +4994,29 @@
   {
    "status": "skipped",
    "route": "messages",
+   "reason": "Not run: lmgw's model card for this model lists no on-demand compaction.",
+   "id": 14,
+   "count": 10,
+   "scenarios": [
+    "compaction"
+   ],
+   "models": [
+    "kilo/anthropic/claude-haiku-5.5",
+    "kilo/openai/gpt-6-luna",
+    "kilo/google/gemini-3.8-flash",
+    "openai/gpt-6-luna",
+    "aistudio/gemini-3.8-flash"
+   ],
+   "modes": [
+    "plain",
+    "stream"
+   ]
+  },
+  {
+   "status": "skipped",
+   "route": "messages",
    "reason": "Not run: lmgw's model card for this model lists no reasoning control.",
-   "id": 16,
+   "id": 15,
    "count": 2,
    "scenarios": [
     "reasoning_tool"
